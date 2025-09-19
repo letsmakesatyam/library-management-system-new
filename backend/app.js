@@ -2,11 +2,13 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const cors = require('cors');
 const app = express();
 const pool = require('./db');
 
 
 app.use(express.json());
+app.use(cors());
 
 app.get('/', (req, res) => {
   res.send('Backend is running 🚀');
