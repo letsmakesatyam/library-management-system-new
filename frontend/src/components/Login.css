@@ -44,3 +44,15 @@
 .login-btn:hover {
   background: #34495e;
 }
+.error {
+  margin-top: 1rem;
+  color: red;
+  text-align: center;
+}
+
+.success {
+  margin-top: 1rem;
+  color: green;
+  text-align: center;
+}
+
