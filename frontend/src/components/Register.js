@@ -19,7 +19,6 @@ class Register extends Component {
     e.preventDefault();
     const { name, role, roll_no, password, adminSecret } = this.state;
 
-    // Prepare payload according to role
     const payload = { name, role, password };
     if (role === 'student') payload.roll_no = roll_no;
     if (role === 'admin') payload.adminSecret = adminSecret;
@@ -34,8 +33,14 @@ class Register extends Component {
       const data = await res.json();
 
       if (res.ok) {
-        this.setState({ message: 'Registration successful! Token: ' + data.token });
-        // Optionally, redirect to login page
+        
+
+        this.setState({ message: 'Registration successful! Redirecting...' });
+
+        // Redirect to login after short delay
+        setTimeout(() => {
+          this.props.history.push('/login');
+        }, 1500);
       } else {
         this.setState({ message: data.error });
       }
