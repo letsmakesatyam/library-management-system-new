@@ -146,29 +146,34 @@ const verifyToken = (req, res, next) => {
 // Admin route to add a book
 // Admin route to add a book
 // Admin route to add a book
+// Admin route to add a book
 app.post('/books', verifyToken, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).json({ error: 'Only admins can add books' });
   }
 
-  const { title, author, isbn, copies } = req.body;
+  const { title, author, isbn, copies, description, published_year, category, image_url } = req.body;
+
   if (!title || !author || !copies) {
     return res.status(400).json({ error: 'Title, author, and copies are required' });
   }
 
   try {
     const result = await pool.query(
-      `INSERT INTO books (title, author, isbn, total_copies, available_copies)
-       VALUES ($1, $2, $3, $4, $4)
+      `INSERT INTO books 
+        (title, author, isbn, total_copies, available_copies, description, published_year, category, image_url)
+       VALUES ($1, $2, $3, $4, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [title, author, isbn, copies]
+      [title, author, isbn, copies, description || null, published_year || null, category || null, image_url || null]
     );
+
     res.json({ book: result.rows[0] });
   } catch (err) {
     console.error(err);
     res.status(500).send('Server error');
   }
 });
+
 
 
 

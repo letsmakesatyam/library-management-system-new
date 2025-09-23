@@ -1,5 +1,6 @@
 // Dashboard.js
 import React, { Component } from "react";
+import BookCard from "./BookCard";
 import "./Dashboard.css";
 
 class Dashboard extends Component {
@@ -41,14 +42,11 @@ class Dashboard extends Component {
     if (!availableBooks.length) return <p>No books available currently.</p>;
 
     return (
-      <ul>
+      <div className="books-grid">
         {availableBooks.map((book) => (
-          <li key={book.id}>
-            <strong>{book.title}</strong> by {book.author}
-            {book.isbn && ` (ISBN: ${book.isbn})`}
-          </li>
+          <BookCard key={book.id} book={book} />
         ))}
-      </ul>
+      </div>
     );
   }
 
