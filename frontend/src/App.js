@@ -1,23 +1,18 @@
-import { Switch, Route, Link } from "react-router-dom";
+import React from "react";
+import { Switch, Route } from "react-router-dom";
 import Home from "./components/Home";
 import About from "./components/About";
 import Login from "./components/Login";
-import Register  from "./components/Register";
-
+import Register from "./components/Register";
+import Navbar from "./components/Navbar"; // ✅ import Navbar
 import "./App.css";
-
 
 function App() {
   return (
     <div className="app-container">
       <header className="app-header">
         <h2>📚 Library App</h2>
-        <nav>
-          <Link to="/" className="nav-link">Home</Link>
-          <Link to="/about" className="nav-link">About</Link>
-          <Link to="/login" className="nav-link">Login</Link>
-          <Link to = "/register" className="nav-link">Register</Link>
-        </nav>
+        <Navbar /> {/* ✅ Now Navbar is separate */}
       </header>
 
       <main className="app-main">
@@ -25,7 +20,7 @@ function App() {
           <Route exact path="/" component={Home} />
           <Route path="/about" component={About} />
           <Route path="/login" component={Login} />
-          <Route path = "/register" component = {Register} />
+          <Route path="/register" component={Register} />
         </Switch>
       </main>
 
