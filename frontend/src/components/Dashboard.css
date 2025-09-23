@@ -1,111 +1,191 @@
 /* Dashboard.css */
 
 .dashboard-container {
-  max-width: 1400px;
-  margin: 30px auto;
-  padding: 20px;
-  background: #f9f9f9;
-  border-radius: 10px;
+  padding: 2rem;
+  font-family: Arial, sans-serif;
 }
 
 .dashboard-container h2 {
   text-align: center;
-  margin-bottom: 25px;
+  margin-bottom: 2rem;
   color: #333;
 }
 
-/* ============ ADMIN LAYOUT ============ */
 .admin-dashboard {
+  max-width: 1200px;
+  margin: auto;
+}
+
+/* --- Tab Navigation --- */
+.admin-tabs {
   display: flex;
-  gap: 25px;
-  align-items: flex-start;
+  justify-content: center;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #ddd;
 }
 
-/* Books side (70%) */
-.admin-books {
-  flex: 7;
-  background: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+.admin-tabs button {
+  background-color: transparent;
+  border: none;
+  padding: 1rem 1.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  color: #555;
+  transition: all 0.3s ease;
+  border-radius: 8px 8px 0 0;
+  border-bottom: 2px solid transparent;
 }
 
+.admin-tabs button:hover {
+  background-color: #f0f0f0;
+}
+
+.admin-tabs button.active-tab {
+  color: #007bff;
+  font-weight: bold;
+  border-bottom-color: #007bff;
+}
+
+/* --- Tab Content --- */
+.tab-content {
+  background-color: #fff;
+  padding: 2rem;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* --- All Books Section --- */
 .admin-books h3 {
-  margin-bottom: 15px;
-  color: #444;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #007bff;
 }
 
-.admin-books input {
+.admin-books input[type="text"] {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 1px solid #bbb;
-  border-radius: 6px;
-  font-size: 14px;
+  padding: 0.75rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
 }
 
-/* Books grid */
+/* --- Books Grid --- */
 .books-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  justify-content: center;
 }
 
-/* Add book form side (30%) */
-.add-book-form {
-  flex: 3;
-  background: #fff;
-  padding: 20px;
+/* --- Book Card Styles (if not already styled elsewhere) --- */
+.book-card {
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.book-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.book-card-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.book-card-details {
+  padding: 1rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.book-card-details h4 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.book-card-details p {
+  margin: 0;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+/* --- Add Book Form --- */
+.add-book-form {
+  max-width: 600px;
+  margin: auto;
 }
 
 .add-book-form h3 {
-  margin-bottom: 15px;
-  color: #444;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #007bff;
 }
 
 .add-book-form form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1rem;
 }
 
 .add-book-form input,
-.add-book-form textarea,
-.add-book-form button {
-  padding: 10px;
+.add-book-form textarea {
+  padding: 0.75rem;
   border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
+  border-radius: 5px;
+  font-size: 1rem;
 }
 
 .add-book-form textarea {
   resize: vertical;
-  min-height: 80px;
+  min-height: 100px;
 }
 
 .add-book-form button {
-  background-color: #4caf50;
-  color: #fff;
+  padding: 1rem;
+  background-color: #28a745;
+  color: white;
   border: none;
-  font-weight: bold;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background 0.2s ease;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
 }
 
 .add-book-form button:hover {
-  background-color: #45a049;
+  background-color: #218838;
 }
 
-/* ============ STUDENT VIEW ============ */
-.error {
-  color: red;
+/* --- Other Tab Content --- */
+.tab-content > div {
   text-align: center;
+  padding: 2rem 0;
 }
 
-p {
+/* --- Error and Loading States --- */
+p.error {
+  color: #dc3545;
   text-align: center;
-  font-size: 15px;
-  color: #555;
+  font-weight: bold;
+}
+/* Update this section in your Dashboard.css file */
+.dashboard-container h2 {
+  text-align: center;
+  margin-top: 5rem; /* Add a top margin to push the heading down */
+  margin-bottom: 2rem;
+  color: #333;
 }

@@ -334,3 +334,32 @@ app.patch('/transactions/:id/return', verifyToken, async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
+// Admin: update a book
+app.patch('/books/:id', verifyToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only admins can update books' });
+  }
+
+  const bookId = req.params.id;
+  const { title, author, isbn, total_copies, available_copies, description, published_year, category, image_url } = req.body;
+
+  try {
+    const result = await pool.query(
+      `UPDATE books
+       SET title = $1, author = $2, isbn = $3, total_copies = $4, available_copies = $5, description = $6, published_year = $7, category = $8, image_url = $9
+       WHERE id = $10
+       RETURNING *`,
+      [title, author, isbn, total_copies, available_copies, description, published_year, category, image_url, bookId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Book not found' });
+    }
+
+    res.json({ book: result.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});

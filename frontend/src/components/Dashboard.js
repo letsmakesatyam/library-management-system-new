@@ -9,6 +9,7 @@ class Dashboard extends Component {
     loading: true,
     error: "",
     searchTerm: "",
+    activeTab: "Books", // 🆕 admin tabs
   };
 
   componentDidMount() {
@@ -40,7 +41,6 @@ class Dashboard extends Component {
     }
   };
 
-  // 🆕 Add book handler with backend's variable names
   handleAddBook = async (event) => {
     event.preventDefault();
     const token = localStorage.getItem("token");
@@ -49,7 +49,7 @@ class Dashboard extends Component {
       title: event.target.title.value,
       author: event.target.author.value,
       isbn: event.target.isbn.value,
-      copies: event.target.copies.value, // backend expects "copies"
+      copies: event.target.copies.value,
       description: event.target.description.value,
       published_year: event.target.published_year.value,
       category: event.target.category.value,
@@ -69,7 +69,7 @@ class Dashboard extends Component {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to add book");
 
-      this.fetchBooks(token); // reload list
+      this.fetchBooks(token);
       event.target.reset();
     } catch (err) {
       console.error(err);
@@ -77,7 +77,6 @@ class Dashboard extends Component {
     }
   };
 
-  // 🆕 search handler
   handleSearch = (e) => {
     this.setState({ searchTerm: e.target.value.toLowerCase() });
   };
@@ -92,22 +91,32 @@ class Dashboard extends Component {
     );
   };
 
-  render() {
-    const { loading, error, searchTerm } = this.state;
-    const isAdmin = this.props.userRole === "admin"; // passed from App.js
+  setActiveTab = (tab) => {
+    this.setState({ activeTab: tab });
+  };
 
-    if (loading) return <p>Loading books...</p>;
-    if (error) return <p className="error">{error}</p>;
-
+  renderAdminTabs = () => {
+    const { activeTab, searchTerm } = this.state;
     const filteredBooks = this.filterBooks();
 
     return (
-      <div className="dashboard-container">
-        <h2>📚 Library Dashboard</h2>
+      <div className="admin-dashboard">
+        {/* Tab Navigation */}
+        <div className="admin-tabs">
+          {["Books", "Add Book", "Update/Delete Book", "Students", "Book Borrowers"].map((tab) => (
+            <button
+              key={tab}
+              className={activeTab === tab ? "active-tab" : ""}
+              onClick={() => this.setActiveTab(tab)}
+            >
+              {tab}
+            </button>
+          ))}
+        </div>
 
-        {isAdmin ? (
-          <div className="admin-dashboard">
-            {/* LEFT: Books list with search */}
+        {/* Tab Contents */}
+        <div className="tab-content">
+          {activeTab === "Books" && (
             <div className="admin-books">
               <h3>All Books</h3>
               <input
@@ -120,14 +129,13 @@ class Dashboard extends Component {
                 {filteredBooks.length === 0 ? (
                   <p>No books found.</p>
                 ) : (
-                  filteredBooks.map((book) => (
-                    <BookCard key={book.id} book={book} />
-                  ))
+                  filteredBooks.map((book) => <BookCard key={book.id} book={book} />)
                 )}
               </div>
             </div>
+          )}
 
-            {/* RIGHT: Add new book form */}
+          {activeTab === "Add Book" && (
             <div className="add-book-form">
               <h3>Add New Book</h3>
               <form onSubmit={this.handleAddBook}>
@@ -142,17 +150,43 @@ class Dashboard extends Component {
                 <button type="submit">➕ Add Book</button>
               </form>
             </div>
-          </div>
-        ) : (
-          // Student view
+          )}
+
+          {activeTab === "Update/Delete Book" && (
+            <div>
+              <h3>Update/Delete Book (Coming Soon)</h3>
+            </div>
+          )}
+
+          {activeTab === "Students" && (
+            <div>
+              <h3>All Students & Transactions (Coming Soon)</h3>
+            </div>
+          )}
+
+          {activeTab === "Book Borrowers" && (
+            <div>
+              <h3>Book Borrowers Details (Coming Soon)</h3>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  render() {
+    const { loading, error } = this.state;
+    const isAdmin = this.props.userRole === "admin";
+
+    if (loading) return <p>Loading books...</p>;
+    if (error) return <p className="error">{error}</p>;
+
+    return (
+      <div className="dashboard-container">
+        <h2>📚 Library Dashboard</h2>
+        {isAdmin ? this.renderAdminTabs() : (
           <div className="books-grid">
-            {filteredBooks.length === 0 ? (
-              <p>No books available currently.</p>
-            ) : (
-              filteredBooks.map((book) => (
-                <BookCard key={book.id} book={book} />
-              ))
-            )}
+            {this.filterBooks().map((book) => <BookCard key={book.id} book={book} />)}
           </div>
         )}
       </div>
