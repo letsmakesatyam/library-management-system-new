@@ -20,9 +20,7 @@ class Login extends Component {
     try {
       const response = await fetch("http://localhost:3000/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: this.state.name,
           password: this.state.password,
@@ -39,10 +37,13 @@ class Login extends Component {
       // Save JWT token in localStorage
       localStorage.setItem("token", data.token);
 
+      // Update parent App state
+      this.props.handleLogin();
+
       this.setState({ success: "Login successful!" });
 
-      // redirect to home page
-      this.props.history.push("/");
+      // Redirect to home page
+      this.props.history.push('/dashboard'); // go to student dashboard
     } catch (err) {
       console.error(err);
       this.setState({ error: "Something went wrong. Try again!" });
@@ -78,7 +79,9 @@ class Login extends Component {
             />
           </div>
 
-          <button type="submit" className="login-btn">Login</button>
+          <button type="submit" className="login-btn">
+            Login
+          </button>
         </form>
 
         {this.state.error && <p className="error">{this.state.error}</p>}
