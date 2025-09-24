@@ -26,6 +26,9 @@
 .book-info {
   padding: 15px;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .book-title {
@@ -56,4 +59,96 @@
   margin: 4px 0;
   font-size: 0.85rem;
   color: #555;
+}
+
+/* --- Buttons inside BookCard --- */
+.book-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.book-actions button {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/* Styled Edit Button */
+.book-actions .edit-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.book-actions .edit-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Styled Delete Button */
+.book-actions .delete-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.book-actions .delete-btn:hover {
+  background-color: #c82333;
+}
+
+/* --- Edit Book Form/Card --- */
+.book-edit-card {
+  display: flex;
+  flex-direction: column;
+  width: 300px; /* bigger than previous small width */
+  background: #fefefe;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  margin: 10px;
+}
+
+.book-edit-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.book-edit-card input,
+.book-edit-card textarea {
+  padding: 0.5rem;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
+}
+
+.book-edit-card button {
+  padding: 0.5rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Save button */
+.book-edit-card .save-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+}
+.book-edit-card .save-btn:hover {
+  background-color: #218838;
+}
+
+/* Cancel button */
+.book-edit-card .cancle-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+}
+.book-edit-card .cancle-btn:hover {
+  background-color: #c82333;
 }
