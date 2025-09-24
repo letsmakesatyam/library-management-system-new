@@ -9,7 +9,7 @@ class Dashboard extends Component {
     loading: true,
     error: "",
     searchTerm: "",
-    activeTab: "Books", // 🆕 admin tabs
+    activeTab: "Books",
   };
 
   componentDidMount() {
@@ -95,23 +95,33 @@ class Dashboard extends Component {
     this.setState({ activeTab: tab });
   };
 
+  handleDeleteBook = (id) => {
+    // Remove deleted book from state
+    this.setState((prevState) => ({
+      availableBooks: prevState.availableBooks.filter((book) => book.id !== id),
+    }));
+  };
+
   renderAdminTabs = () => {
     const { activeTab, searchTerm } = this.state;
+    const token = localStorage.getItem("token");
     const filteredBooks = this.filterBooks();
 
     return (
       <div className="admin-dashboard">
         {/* Tab Navigation */}
         <div className="admin-tabs">
-          {["Books", "Add Book", "Update/Delete Book", "Students", "Book Borrowers"].map((tab) => (
-            <button
-              key={tab}
-              className={activeTab === tab ? "active-tab" : ""}
-              onClick={() => this.setActiveTab(tab)}
-            >
-              {tab}
-            </button>
-          ))}
+          {["Books", "Add Book", "Update/Delete Book", "Students", "Book Borrowers"].map(
+            (tab) => (
+              <button
+                key={tab}
+                className={activeTab === tab ? "active-tab" : ""}
+                onClick={() => this.setActiveTab(tab)}
+              >
+                {tab}
+              </button>
+            )
+          )}
         </div>
 
         {/* Tab Contents */}
@@ -129,7 +139,14 @@ class Dashboard extends Component {
                 {filteredBooks.length === 0 ? (
                   <p>No books found.</p>
                 ) : (
-                  filteredBooks.map((book) => <BookCard key={book.id} book={book} />)
+                  filteredBooks.map((book) => (
+                    <BookCard
+                      key={book.id}
+                      book={book}
+                      token={token}
+                      onDelete={this.handleDeleteBook} // ✅ pass delete callback
+                    />
+                  ))
                 )}
               </div>
             </div>
@@ -153,10 +170,25 @@ class Dashboard extends Component {
           )}
 
           {activeTab === "Update/Delete Book" && (
-            <div>
-              <h3>Update/Delete Book (Coming Soon)</h3>
+          <div className="update-delete-books">
+            <h3>Update / Delete Books</h3>
+            <div className="books-grid">
+              {filteredBooks.length === 0 ? (
+                <p>No books found.</p>
+              ) : (
+                filteredBooks.map((book) => (
+                  <BookCard
+                    key={book.id}
+                    book={book}
+                    token={token} // needed for delete
+                    onDelete={this.handleDeleteBook} // updates Dashboard state
+                  />
+                ))
+              )}
             </div>
+          </div>
           )}
+
 
           {activeTab === "Students" && (
             <div>
@@ -184,11 +216,15 @@ class Dashboard extends Component {
     return (
       <div className="dashboard-container">
         <h2>📚 Library Dashboard</h2>
-        {isAdmin ? this.renderAdminTabs() : (
-          <div className="books-grid">
-            {this.filterBooks().map((book) => <BookCard key={book.id} book={book} />)}
-          </div>
-        )}
+        {isAdmin
+          ? this.renderAdminTabs()
+          : (
+            <div className="books-grid">
+              {this.filterBooks().map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))}
+            </div>
+          )}
       </div>
     );
   }

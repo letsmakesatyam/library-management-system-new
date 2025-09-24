@@ -363,3 +363,26 @@ app.patch('/books/:id', verifyToken, async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
+
+// Admin: delete a book
+app.delete('/books/:id', verifyToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only admins can delete books' });
+  }
+
+  const bookId = req.params.id;
+
+  try {
+    const result = await pool.query('DELETE FROM books WHERE id = $1 RETURNING *', [bookId]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Book not found' });
+    }
+
+    res.json({ message: 'Book deleted successfully', book: result.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send('Server error');
+  }
+});
