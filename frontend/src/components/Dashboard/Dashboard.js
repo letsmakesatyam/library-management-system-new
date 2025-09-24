@@ -147,6 +147,39 @@ class Dashboard extends Component {
       alert(err.message);
     }
   };
+  handleBorrowBook = async (bookId) => {
+  const token = localStorage.getItem("token");
+  if (!token) return alert("Not authenticated");
+
+  try {
+    const res = await fetch(`http://localhost:3000/borrow/${bookId}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.error || "Failed to borrow book");
+
+    alert("Book borrowed successfully ✅");
+
+    // Update available copies in UI
+    this.setState((prevState) => ({
+      availableBooks: prevState.availableBooks.map((book) =>
+        book.id === bookId
+          ? { ...book, available_copies: book.available_copies - 1 }
+          : book
+      ),
+    }));
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
+};
+
 
   renderAdminTabs = () => {
     const { activeTab, searchTerm, editingBookId } = this.state;
@@ -190,6 +223,7 @@ class Dashboard extends Component {
   };
 
   render() {
+    const token = localStorage.getItem("token");
     const { loading, error } = this.state;
     const isAdmin = this.props.userRole === "admin";
 
@@ -206,6 +240,9 @@ class Dashboard extends Component {
             searchTerm={this.state.searchTerm}
             handleSearch={this.handleSearch}
             filteredBooks={this.filterBooks()}
+            token={token}  // optional for internal fetch
+  onBorrow={this.handleBorrowBook} // <-- new prop
+  userRole={this.props.userRole}   
           />
         )}
       </div>
