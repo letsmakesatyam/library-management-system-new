@@ -10,6 +10,7 @@ class Dashboard extends Component {
     error: "",
     searchTerm: "",
     activeTab: "Books",
+    editingBookId: null, // currently editing book
   };
 
   componentDidMount() {
@@ -92,24 +93,63 @@ class Dashboard extends Component {
   };
 
   setActiveTab = (tab) => {
-    this.setState({ activeTab: tab });
+    this.setState({ activeTab: tab, editingBookId: null });
   };
 
   handleDeleteBook = (id) => {
-    // Remove deleted book from state
     this.setState((prevState) => ({
       availableBooks: prevState.availableBooks.filter((book) => book.id !== id),
     }));
   };
 
+  handleUpdateBook = async (event, id) => {
+    event.preventDefault();
+    const token = localStorage.getItem("token");
+
+    const updatedData = {
+      title: event.target.title.value,
+      author: event.target.author.value,
+      isbn: event.target.isbn.value,
+      total_copies: event.target.total_copies.value,
+      available_copies: event.target.available_copies.value,
+      description: event.target.description.value,
+      published_year: event.target.published_year.value,
+      category: event.target.category.value,
+      image_url: event.target.image_url.value,
+    };
+
+    try {
+      const res = await fetch(`http://localhost:3000/books/${id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update book");
+
+      this.setState((prevState) => ({
+        availableBooks: prevState.availableBooks.map((book) =>
+          book.id === id ? data.book : book
+        ),
+        editingBookId: null,
+      }));
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    }
+  };
+
   renderAdminTabs = () => {
-    const { activeTab, searchTerm } = this.state;
+    const { activeTab, searchTerm, editingBookId } = this.state;
     const token = localStorage.getItem("token");
     const filteredBooks = this.filterBooks();
 
     return (
       <div className="admin-dashboard">
-        {/* Tab Navigation */}
         <div className="admin-tabs">
           {["Books", "Add Book", "Update/Delete Book", "Students", "Book Borrowers"].map(
             (tab) => (
@@ -124,7 +164,6 @@ class Dashboard extends Component {
           )}
         </div>
 
-        {/* Tab Contents */}
         <div className="tab-content">
           {activeTab === "Books" && (
             <div className="admin-books">
@@ -144,7 +183,7 @@ class Dashboard extends Component {
                       key={book.id}
                       book={book}
                       token={token}
-                      onDelete={this.handleDeleteBook} // ✅ pass delete callback
+                      onDelete={this.handleDeleteBook}
                     />
                   ))
                 )}
@@ -170,25 +209,45 @@ class Dashboard extends Component {
           )}
 
           {activeTab === "Update/Delete Book" && (
-          <div className="update-delete-books">
-            <h3>Update / Delete Books</h3>
-            <div className="books-grid">
-              {filteredBooks.length === 0 ? (
-                <p>No books found.</p>
-              ) : (
-                filteredBooks.map((book) => (
-                  <BookCard
-                    key={book.id}
-                    book={book}
-                    token={token} // needed for delete
-                    onDelete={this.handleDeleteBook} // updates Dashboard state
-                  />
-                ))
-              )}
-            </div>
-          </div>
-          )}
+            <div className="update-delete-books">
+              <h3>Update / Delete Books</h3>
+              <div className="books-grid">
+                {filteredBooks.length === 0 ? (
+                  <p>No books found.</p>
+                ) : (
+                  filteredBooks.map((book) => (
+                    <div key={book.id} className="book-edit-card">
+                      {editingBookId === book.id ? (
+                        <form onSubmit={(e) => this.handleUpdateBook(e, book.id)}>
+  <input type="text" name="title" defaultValue={book.title || ""} placeholder="Title" required />
+  <input type="text" name="author" defaultValue={book.author || ""} placeholder="Author" required />
+  <input type="text" name="isbn" defaultValue={book.isbn || ""} placeholder="ISBN" />
+  <input type="number" name="total_copies" defaultValue={book.total_copies || 0} placeholder="Total Copies" required />
+  <input type="number" name="available_copies" defaultValue={book.available_copies || 0} placeholder="Available Copies" required />
+  <input type="text" name="category" defaultValue={book.category || ""} placeholder="Category" />
+  <input type="number" name="published_year" defaultValue={book.published_year || ""} placeholder="Published Year" />
+  <input type="text" name="image_url" defaultValue={book.image_url || ""} placeholder="Image URL" />
+  <textarea name="description" defaultValue={book.description || ""} placeholder="Description"></textarea>
+  <button type="submit">💾 Save</button>
+  <button type="button" onClick={() => this.setState({ editingBookId: null })}>❌ Cancel</button>
+</form>
 
+                      ) : (
+                        <>
+                          <BookCard
+                            book={book}
+                            token={token}
+                            onDelete={this.handleDeleteBook}
+                          />
+                          <button onClick={() => this.setState({ editingBookId: book.id })}>✏️ Edit</button>
+                        </>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
 
           {activeTab === "Students" && (
             <div>

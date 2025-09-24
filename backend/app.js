@@ -347,7 +347,8 @@ app.patch('/books/:id', verifyToken, async (req, res) => {
   try {
     const result = await pool.query(
       `UPDATE books
-       SET title = $1, author = $2, isbn = $3, total_copies = $4, available_copies = $5, description = $6, published_year = $7, category = $8, image_url = $9
+       SET title = $1, author = $2, isbn = $3, total_copies = $4, available_copies = $5,
+           description = $6, published_year = $7, category = $8, image_url = $9
        WHERE id = $10
        RETURNING *`,
       [title, author, isbn, total_copies, available_copies, description, published_year, category, image_url, bookId]
@@ -360,9 +361,10 @@ app.patch('/books/:id', verifyToken, async (req, res) => {
     res.json({ book: result.rows[0] });
   } catch (err) {
     console.error(err);
-    res.status(500).send('Server error');
+    res.status(500).json({ error: 'Server error' }); // ✅ JSON response
   }
 });
+
 
 
 // Admin: delete a book
