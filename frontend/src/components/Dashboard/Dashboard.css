@@ -1,0 +1,96 @@
+/* Dashboard.css */
+
+/* Root container */
+.dashboard-container {
+  padding: 30px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #f4f6f9;
+  min-height: 100vh;
+  color: #333;
+}
+
+/* Page title */
+.dashboard-container h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 30px;
+  color: #222;
+  letter-spacing: 0.5px;
+}
+
+/* Tabs wrapper */
+.admin-dashboard {
+  display: flex;
+  flex-direction: column; /* stack tabs on top of content */
+  align-items: center;
+  width: 100%;
+  gap: 20px; /* spacing between tabs and content */
+}
+
+/* Tabs row */
+.admin-tabs {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  width: 100%;
+}
+
+/* Tab buttons */
+.admin-tabs button {
+  background: #ffffff;
+  border: 2px solid #007bff;
+  color: #007bff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.admin-tabs button:hover {
+  background: #007bff;
+  color: #ffffff;
+}
+
+.admin-tabs button.active-tab {
+  background: #007bff;
+  color: #fff;
+  border-color: #0056b3;
+}
+
+/* Tab content section */
+.tab-content {
+  width: 100%; /* full width below tabs */
+  max-width: 1200px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Error messages */
+.error {
+  margin-top: 15px;
+  color: #d9534f;
+  font-weight: bold;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-tabs {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .admin-tabs button {
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .tab-content {
+    padding: 20px;
+  }
+}

@@ -1,0 +1,86 @@
+/* AddBookForm.css */
+
+/* Form container */
+.add-book-form {
+  max-width: 600px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Heading */
+.add-book-form h3 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Form layout */
+.add-book-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Inputs & textarea */
+.add-book-form input,
+.add-book-form textarea {
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  background: #f9f9f9;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  resize: vertical;
+}
+
+.add-book-form input:focus,
+.add-book-form textarea:focus {
+  border-color: #007bff;
+  background: #fff;
+  outline: none;
+  box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+}
+
+/* Textarea */
+.add-book-form textarea {
+  min-height: 80px;
+}
+
+/* Submit button */
+.add-book-form button {
+  padding: 12px 15px;
+  border: none;
+  border-radius: 30px;
+  background-color: #28a745;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.add-book-form button:hover {
+  background-color: #218838;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .add-book-form {
+    padding: 20px;
+  }
+
+  .add-book-form h3 {
+    font-size: 1.3rem;
+  }
+
+  .add-book-form button {
+    font-size: 0.95rem;
+  }
+}

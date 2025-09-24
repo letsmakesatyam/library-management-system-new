@@ -388,3 +388,22 @@ app.delete('/books/:id', verifyToken, async (req, res) => {
     res.status(500).send('Server error');
   }
 });
+
+
+// Get all students (Admin only)
+app.get('/users', verifyToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only admins can view students' });
+  }
+
+  try {
+    const result = await pool.query(
+      'SELECT id, name, roll_no FROM users WHERE role = $1',
+      ['student']
+    );
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});

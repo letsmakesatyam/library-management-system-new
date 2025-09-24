@@ -1,0 +1,95 @@
+/* UpdateDeleteTab.css */
+
+/* Container */
+.update-delete-books {
+  margin-top: 20px;
+  padding: 20px;
+  width: 100%;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  box-sizing: border-box;
+}
+
+/* Heading */
+.update-delete-books h3 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #222;
+}
+
+/* Grid for cards */
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 20px;
+  justify-items: center; /* center cards */
+}
+
+/* Empty state */
+.books-grid p {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #777;
+  font-style: italic;
+}
+
+/* Each book card wrapper */
+.book-edit-card {
+  width: 100%;
+  max-width: 240px; /* matches grid min width */
+  background: #fafafa;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+}
+
+/* Make inner elements fill width */
+.book-edit-card > * {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Edit button when not editing */
+.book-edit-card > button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #007bff;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  align-self: flex-end;
+  transition: background 0.3s ease;
+}
+
+.book-edit-card > button:hover {
+  background: #0056b3;
+}
+
+/* Ensure BookCard images fit nicely */
+.book-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .books-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .book-edit-card > button {
+    align-self: center;
+    width: 50%;
+  }
+}
