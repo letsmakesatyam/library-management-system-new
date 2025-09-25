@@ -434,3 +434,79 @@ app.get('/transactions/book/:bookId', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+
+// ===============================
+// Student Dashboard APIs
+// ===============================
+
+// Get logged-in student profile
+app.get('/student/profile', verifyToken, async (req, res) => {
+  if (req.user.role !== 'student') {
+    return res.status(403).json({ error: 'Only students can view profile' });
+  }
+
+  try {
+    const result = await pool.query(
+      'SELECT id, name, roll_no FROM users WHERE id = $1',
+      [req.user.id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Get all borrow history of logged-in student
+app.get('/student/history', verifyToken, async (req, res) => {
+  if (req.user.role !== 'student') {
+    return res.status(403).json({ error: 'Only students can view history' });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT t.id, b.title AS book_title, t.borrowed_at, t.returned_at, t.status
+       FROM transactions t
+       JOIN books b ON t.book_id = b.id
+       WHERE t.user_id = $1
+       ORDER BY t.borrowed_at DESC`,
+      [req.user.id]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// Get currently borrowed (not returned) books with due date
+// (for simplicity, we assume 14 days due period after borrow)
+app.get('/student/current-borrows', verifyToken, async (req, res) => {
+  if (req.user.role !== 'student') {
+    return res.status(403).json({ error: 'Only students can view current borrows' });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT t.id, b.title AS book_title, t.borrowed_at,
+              (t.borrowed_at + INTERVAL '14 days') AS due_date
+       FROM transactions t
+       JOIN books b ON t.book_id = b.id
+       WHERE t.user_id = $1 AND t.status = 'borrowed'
+       ORDER BY t.borrowed_at DESC`,
+      [req.user.id]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
