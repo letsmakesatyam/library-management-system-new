@@ -4,9 +4,10 @@ import Tabs from "./Tabs";
 import BooksTab from "./BooksTab";
 import AddBookForm from "./AddBookForm";
 import UpdateDeleteTab from "./UpdateDeleteTab";
-import ComingSoon from "./ComingSoon";
+
 import "./Dashboard.css";
 import StudentsTab from "./StudentTab";
+import BookBorrowersTab from "./BookBorrowersTab";
 
 
 class Dashboard extends Component {
@@ -216,7 +217,7 @@ class Dashboard extends Component {
           )}
 
           {activeTab === "Students" && <StudentsTab token={token}/>}
-          {activeTab === "Book Borrowers" && <ComingSoon label="Book Borrowers Details" />}
+          {activeTab === "Book Borrowers" && <BookBorrowersTab availableBooks={this.state.availableBooks} />}
         </div>
       </div>
     );

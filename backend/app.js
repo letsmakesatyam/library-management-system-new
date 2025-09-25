@@ -407,3 +407,30 @@ app.get('/users', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+
+// Get all borrowers of a specific book (Admin only)
+app.get('/transactions/book/:bookId', verifyToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only admins can view borrowers' });
+  }
+
+  const { bookId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT t.id, u.name AS student_name, u.roll_no, 
+              t.borrowed_at, t.returned_at, t.status
+       FROM transactions t
+       JOIN users u ON t.user_id = u.id
+       WHERE t.book_id = $1
+       ORDER BY t.borrowed_at DESC`,
+      [bookId]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});

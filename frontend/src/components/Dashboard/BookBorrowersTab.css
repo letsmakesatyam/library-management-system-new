@@ -1,0 +1,44 @@
+.borrowers-tab {
+  padding: 16px;
+}
+
+.books-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.book-card {
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f4f4f4;
+  width: 180px;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.book-card:hover {
+  background: #e0e0e0;
+}
+
+.book-card.active {
+  background: #d0ebff;
+  border: 2px solid #339af0;
+}
+
+.borrowers-list table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 16px;
+}
+
+.borrowers-list th, .borrowers-list td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.borrowers-list th {
+  background: #f0f0f0;
+}
