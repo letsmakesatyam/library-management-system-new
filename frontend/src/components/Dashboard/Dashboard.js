@@ -120,6 +120,34 @@ class Dashboard extends Component {
       alert(err.message);
     }
   };
+ handleReturnBook = async (transactionId, bookId) => {
+  const token = localStorage.getItem("token");
+  if (!token) return alert("Not authenticated");
+
+  try {
+    const res = await fetch(`http://localhost:3000/return/${transactionId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Failed to return book");
+
+    alert("Book returned successfully ✅");
+
+    // Update available copies in UI
+    this.setState((prev) => ({
+      availableBooks: prev.availableBooks.map((book) =>
+        book.id === bookId
+          ? { ...book, available_copies: book.available_copies + 1 }
+          : book
+      ),
+    }));
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
+
 
   handleSearch = (e) => this.setState({ searchTerm: e.target.value.toLowerCase() });
 
@@ -232,7 +260,7 @@ class Dashboard extends Component {
               onSave={this.handleUpdateBook}
             />
           )}
-          {activeTab === "Students" && <StudentsTab token={token} />}
+          {activeTab === "Students" && <StudentsTab token={token} onReturnBook={this.handleReturnBook}  />}
           {activeTab === "Book Borrowers" && <BookBorrowersTab availableBooks={this.state.availableBooks} />}
         </div>
       </div>

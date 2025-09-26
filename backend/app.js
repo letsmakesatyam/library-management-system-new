@@ -510,3 +510,40 @@ app.get('/student/current-borrows', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+
+// RETURN BOOK API
+app.post("/return/:transactionId", async (req, res) => {
+  const { transactionId } = req.params;
+
+  try {
+    // 1️⃣ Find the transaction
+    const transactionResult = await pool.query(
+      "SELECT * FROM transactions WHERE id = $1 AND status = 'borrowed'",
+      [transactionId]
+    );
+
+    if (transactionResult.rows.length === 0) {
+      return res.status(404).json({ error: "Transaction not found or already returned" });
+    }
+
+    const transaction = transactionResult.rows[0];
+
+    // 2️⃣ Update transaction status to returned
+    await pool.query(
+      "UPDATE transactions SET status = 'returned', returned_at = NOW() WHERE id = $1",
+      [transactionId]
+    );
+
+    // 3️⃣ Increment available copies in books
+    await pool.query(
+      "UPDATE books SET available_copies = available_copies + 1 WHERE id = $1",
+      [transaction.book_id]
+    );
+
+    res.json({ message: "Book returned successfully", transactionId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to return book" });
+  }
+});

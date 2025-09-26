@@ -46,9 +46,17 @@ class StudentsTab extends Component {
     }
   };
 
-  handleStudentClick = (studentId) => {
-    this.fetchTransactions(studentId);
-  };
+ // StudentsTab.js
+
+handleReturn = async (transactionId, bookId) => {
+  await this.props.onReturnBook(transactionId, bookId);
+
+  // ✅ After return succeeds, re-fetch the student's transactions
+  if (this.state.selectedStudentId) {
+    this.fetchTransactions(this.state.selectedStudentId);
+  }
+};
+
 
   render() {
     const { students, selectedStudentId, transactions, loading, error } = this.state;
@@ -66,7 +74,7 @@ class StudentsTab extends Component {
               <button
                 key={student.id}
                 className={selectedStudentId === student.id ? "active" : ""}
-                onClick={() => this.handleStudentClick(student.id)}
+                onClick={() => this.fetchTransactions(student.id)}
               >
                 {student.name} ({student.roll_no})
               </button>
@@ -100,6 +108,17 @@ class StudentsTab extends Component {
                       <td>{new Date(t.borrowed_at).toLocaleString()}</td>
                       <td>{t.returned_at ? new Date(t.returned_at).toLocaleString() : "-"}</td>
                       <td>{t.status}</td>
+                      <td>
+        {t.status === "borrowed" && (
+          <button
+  onClick={() => this.handleReturn(t.id, t.book_id)}
+  className="return-btn"
+>
+  Return
+</button>
+
+        )}
+      </td>
                     </tr>
                   ))}
                 </tbody>
