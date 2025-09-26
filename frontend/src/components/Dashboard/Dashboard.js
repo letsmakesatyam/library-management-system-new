@@ -247,16 +247,21 @@ fetchFines = async (token) => {
     this.setState({ fines: [] });
   }
 };
+refreshFines = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+  await this.fetchFines(token);
+}; 
 
 
 
   // ---------- Tabs ----------
-  renderAdminTabs = () => {
+  renderAdminTabs = (isAdmin) => {
     const { activeTab, searchTerm, editingBookId } = this.state;
     const token = localStorage.getItem("token");
     const filteredBooks = this.filterBooks();
 
-    const tabs = ["Books", "Add Book", "Update/Delete Book", "Students", "Book Borrowers"];
+    const tabs = ["Books", "Add Book", "Update/Delete Book", "Students", "Book Borrowers" ,];
 
     return (
       <div className="admin-dashboard">
@@ -283,7 +288,7 @@ fetchFines = async (token) => {
     );
   };
 
-  renderStudentTabs = () => {
+  renderStudentTabs = (isAdmin) => {
     const { activeTab, searchTerm, currentBorrows, history, profile , fines } = this.state;
     const token = localStorage.getItem("token");
     const filteredBooks = this.filterBooks();
@@ -300,7 +305,7 @@ fetchFines = async (token) => {
           {activeTab === "Current Borrows" && <CurrentBorrowsTab borrows={currentBorrows} />}
           {activeTab === "History" && <HistoryTab history={history} />}
           {activeTab === "Profile" && <ProfileTab profile={profile} />}
-          {activeTab === "Fines" && <FinesTab fines={this.state.fines} />}
+          {activeTab === "Fines" && <FinesTab fines={this.state.fines} isAdmin={isAdmin} refreshFines={this.refreshFines} />}
 
         </div>
       </div>
