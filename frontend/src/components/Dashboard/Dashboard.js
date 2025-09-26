@@ -10,6 +10,8 @@ import CurrentBorrowsTab from "./CurrentBorrowsTab";
 import HistoryTab from "./HistoryTab";
 import ProfileTab from "./ProfileTab";
 import "./Dashboard.css";
+import FinesTab from "./FinesTab";
+
 
 class Dashboard extends Component {
   state = {
@@ -22,6 +24,7 @@ class Dashboard extends Component {
     currentBorrows: [],
     history: [],
     profile: null,
+     fines: [],
   };
 
   componentDidMount() {
@@ -33,6 +36,7 @@ class Dashboard extends Component {
       this.fetchCurrentBorrows(token);
       this.fetchHistory(token);
       this.fetchProfile(token);
+      this.fetchFines(token);
     }
   }
 
@@ -232,6 +236,18 @@ class Dashboard extends Component {
     alert(err.message);
   }
 };
+fetchFines = async (token) => {
+  try {
+    const res = await fetch("http://localhost:3000/student/fines", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    const data = await res.json();
+    this.setState({ fines: Array.isArray(data) ? data : [] });
+  } catch {
+    this.setState({ fines: [] });
+  }
+};
+
 
 
   // ---------- Tabs ----------
@@ -268,11 +284,11 @@ class Dashboard extends Component {
   };
 
   renderStudentTabs = () => {
-    const { activeTab, searchTerm, currentBorrows, history, profile } = this.state;
+    const { activeTab, searchTerm, currentBorrows, history, profile , fines } = this.state;
     const token = localStorage.getItem("token");
     const filteredBooks = this.filterBooks();
 
-    const tabs = ["Books", "Current Borrows", "History", "Profile"];
+    const tabs = ["Books", "Current Borrows", "History", "Profile" , "Fines"];
 
     return (
       <div className="student-dashboard">
@@ -284,6 +300,8 @@ class Dashboard extends Component {
           {activeTab === "Current Borrows" && <CurrentBorrowsTab borrows={currentBorrows} />}
           {activeTab === "History" && <HistoryTab history={history} />}
           {activeTab === "Profile" && <ProfileTab profile={profile} />}
+          {activeTab === "Fines" && <FinesTab fines={this.state.fines} />}
+
         </div>
       </div>
     );

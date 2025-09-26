@@ -225,11 +225,14 @@ app.post('/borrow/:bookId', verifyToken, async (req, res) => {
     );
 
     // Insert transaction
-    const result = await pool.query(
-      `INSERT INTO transactions (user_id, book_id, status)
-       VALUES ($1, $2, 'borrowed') RETURNING *`,
-      [req.user.id, bookId]
-    );
+    // Insert transaction with due_date (14 days default)
+const result = await pool.query(
+  `INSERT INTO transactions (user_id, book_id, status, due_date)
+   VALUES ($1, $2, 'borrowed', NOW() + INTERVAL '14 days')
+   RETURNING *`,
+  [req.user.id, bookId]
+);
+
 
     res.json({ message: 'Book borrowed successfully ✅', transaction: result.rows[0] });
   } catch (err) {
@@ -287,40 +290,50 @@ app.get('/transactions', verifyToken, async (req, res) => {
   }
 });
 // Admin returns a book
+// Admin returns a book with fine calculation
 app.patch('/transactions/:id/return', verifyToken, async (req, res) => {
   if (req.user.role !== 'admin') {
     return res.status(403).json({ error: 'Only admins can return books' });
   }
 
-  const transactionId = req.params.id;
+  const { id } = req.params;
 
   try {
-    // Get the transaction
-    const result = await pool.query(
+    // 1️⃣ Fetch transaction
+    const txResult = await pool.query(
       'SELECT * FROM transactions WHERE id = $1',
-      [transactionId]
+      [id]
     );
 
-    if (result.rows.length === 0) {
+    if (txResult.rows.length === 0) {
       return res.status(404).json({ error: 'Transaction not found' });
     }
 
-    const transaction = result.rows[0];
+    const transaction = txResult.rows[0];
 
-    // Check if already returned
     if (transaction.status === 'returned') {
       return res.status(400).json({ error: 'Book already returned' });
     }
 
-    // Update transaction to returned
+    // 2️⃣ Calculate fine (e.g., ₹10 per day late)
+    let fineAmount = 0;
+    const today = new Date();
+    const dueDate = new Date(transaction.due_date);
+
+    if (today > dueDate) {
+      const lateDays = Math.ceil((today - dueDate) / (1000 * 60 * 60 * 24));
+      fineAmount = lateDays * 10; // ₹10 per day late
+    }
+
+    // 3️⃣ Update transaction
     await pool.query(
       `UPDATE transactions
        SET returned_at = NOW(), status = 'returned'
        WHERE id = $1`,
-      [transactionId]
+      [id]
     );
 
-    // Increment available copies in books table
+    // 4️⃣ Increment available copies
     await pool.query(
       `UPDATE books
        SET available_copies = available_copies + 1
@@ -328,12 +341,25 @@ app.patch('/transactions/:id/return', verifyToken, async (req, res) => {
       [transaction.book_id]
     );
 
-    res.json({ message: 'Book returned successfully' });
+    // 5️⃣ If fine > 0, insert into fines table
+    if (fineAmount > 0) {
+      await pool.query(
+        `INSERT INTO fines (transaction_id, student_id, amount)
+         VALUES ($1, $2, $3)`,
+        [transaction.id, transaction.user_id, fineAmount]
+      );
+    }
+
+    res.json({
+      message: 'Book returned successfully ✅',
+      fine: fineAmount > 0 ? `Fine applied: ₹${fineAmount}` : 'No fine'
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).send('Server error');
+    res.status(500).json({ error: 'Failed to return book' });
   }
 });
+
 
 // Admin: update a book
 app.patch('/books/:id', verifyToken, async (req, res) => {
@@ -545,5 +571,132 @@ app.post("/return/:transactionId", async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to return book" });
+  }
+});
+// 🛠️ Admin: Update due_date for a transaction
+app.patch('/transactions/:id/due-date', verifyToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only admins can edit due dates' });
+  }
+
+  const { id } = req.params;
+  const { new_due_date } = req.body;
+
+  if (!new_due_date) {
+    return res.status(400).json({ error: 'new_due_date is required (YYYY-MM-DD format)' });
+  }
+
+  try {
+    const result = await pool.query(
+      `UPDATE transactions 
+       SET due_date = $1
+       WHERE id = $2
+       RETURNING id, user_id, book_id, borrowed_at, due_date, status`,
+      [new_due_date, id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Transaction not found' });
+    }
+
+    res.json({ message: 'Due date updated successfully ✅', transaction: result.rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update due date' });
+  }
+});
+
+
+// Student: view their fines
+app.get('/student/fines', verifyToken, async (req, res) => {
+  if (req.user.role !== 'student') {
+    return res.status(403).json({ error: 'Only students can view their fines' });
+  }
+
+  try {
+    const result = await pool.query(
+      `SELECT f.id, f.amount, f.paid, t.book_id, b.title AS book_title, f.created_at
+       FROM fines f
+       JOIN transactions t ON f.transaction_id = t.id
+       JOIN books b ON t.book_id = b.id
+       WHERE f.student_id = $1
+       ORDER BY f.created_at DESC`,
+      [req.user.id]
+    );
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch fines' });
+  }
+});
+
+// Admin: view all fines (optionally filter by student)
+app.get('/fines', verifyToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only admins can view fines' });
+  }
+
+  const studentId = req.query.student_id; // optional filter
+
+  try {
+    let result;
+    if (studentId) {
+      result = await pool.query(
+        `SELECT f.id, f.amount, f.paid, t.book_id, b.title AS book_title, u.name AS student_name, f.created_at
+         FROM fines f
+         JOIN transactions t ON f.transaction_id = t.id
+         JOIN users u ON f.student_id = u.id
+         JOIN books b ON t.book_id = b.id
+         WHERE f.student_id = $1
+         ORDER BY f.created_at DESC`,
+        [studentId]
+      );
+    } else {
+      result = await pool.query(
+        `SELECT f.id, f.amount, f.paid, t.book_id, b.title AS book_title, u.name AS student_name, f.created_at
+         FROM fines f
+         JOIN transactions t ON f.transaction_id = t.id
+         JOIN users u ON f.student_id = u.id
+         JOIN books b ON t.book_id = b.id
+         ORDER BY f.created_at DESC`
+      );
+    }
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch fines' });
+  }
+});
+
+// Admin: mark fine as paid
+app.patch('/fines/:id/pay', verifyToken, async (req, res) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only admins can update fines' });
+  }
+
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      `UPDATE fines
+       SET paid = true
+       WHERE id = $1
+       RETURNING id, transaction_id, student_id, amount, paid, created_at`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Fine not found' });
+    }
+
+    res.json({
+      message: 'Fine marked as paid ✅',
+      fine: result.rows[0]
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update fine' });
   }
 });
