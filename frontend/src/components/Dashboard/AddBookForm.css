@@ -1,86 +1,70 @@
 /* AddBookForm.css */
 
-/* Form container */
-.add-book-form {
+.add-book-form-container {
   max-width: 600px;
-  margin: 0 auto;
-  background: #fff;
-  padding: 25px 30px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-}
-
-/* Heading */
-.add-book-form h3 {
+  margin: 20px auto;
+  padding: 25px;
+  background-color: #f7f9fc;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   text-align: center;
-  margin-bottom: 25px;
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: #222;
 }
 
-/* Form layout */
-.add-book-form form {
+.add-book-form-container h3 {
+  color: #333;
+  margin-bottom: 25px;
+  font-size: 1.8em;
+  font-weight: 600;
+}
+
+.add-book-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
-/* Inputs & textarea */
-.add-book-form input,
+.add-book-form input[type="text"],
+.add-book-form input[type="number"],
 .add-book-form textarea {
-  padding: 12px 15px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 0.95rem;
-  background: #f9f9f9;
-  transition: all 0.3s ease;
   width: 100%;
-  box-sizing: border-box;
-  resize: vertical;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1em;
+  box-sizing: border-box; /* Ensures padding doesn't affect total width */
+  transition: border-color 0.3s ease;
 }
 
 .add-book-form input:focus,
 .add-book-form textarea:focus {
   border-color: #007bff;
-  background: #fff;
   outline: none;
-  box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
 }
 
-/* Textarea */
 .add-book-form textarea {
-  min-height: 80px;
+  resize: vertical;
+  min-height: 100px;
 }
 
-/* Submit button */
 .add-book-form button {
-  padding: 12px 15px;
-  border: none;
-  border-radius: 30px;
+  padding: 12px 20px;
   background-color: #28a745;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 500;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1.1em;
+  font-weight: bold;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .add-book-form button:hover {
   background-color: #218838;
+  transform: translateY(-2px);
 }
 
-/* Responsive */
-@media (max-width: 600px) {
-  .add-book-form {
-    padding: 20px;
-  }
-
-  .add-book-form h3 {
-    font-size: 1.3rem;
-  }
-
-  .add-book-form button {
-    font-size: 0.95rem;
-  }
+.add-book-form button:active {
+  background-color: #1e7e34;
+  transform: translateY(0);
 }

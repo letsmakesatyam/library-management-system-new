@@ -1,0 +1,68 @@
+/* HistoryTab.css */
+.history-container {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.no-history-message {
+  font-size: 1.2em;
+  color: #777;
+  padding: 20px;
+}
+
+.history-container h3 {
+  font-size: 1.8em;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.table-wrapper {
+  overflow-x: auto; /* Enables horizontal scrolling on small screens */
+  width: 100%;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse; /* Merges cell borders */
+  margin: 0 auto; /* Centers the table */
+  background-color: #fff;
+  border: 1px solid #ddd;
+}
+
+.history-table thead tr {
+  background-color: #4CAF50;
+  color: white;
+  text-align: left;
+}
+
+.history-table th,
+.history-table td {
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+}
+
+.history-table th {
+  font-size: 1em;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.history-table tbody tr:nth-of-type(even) {
+  background-color: #f3f3f3;
+}
+
+.history-table tbody tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Responsive design for smaller screens */
+@media screen and (max-width: 600px) {
+  .history-table th,
+  .history-table td {
+    padding: 8px;
+    font-size: 0.9em;
+  }
+}

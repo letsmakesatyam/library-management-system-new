@@ -1,10 +1,11 @@
+// AddBookForm.js
 import React from "react";
-import './AddBookForm.css'
+import './AddBookForm.css' // Import the CSS file
 
 const AddBookForm = ({ onSubmit }) => (
-  <div className="add-book-form">
+  <div className="add-book-form-container">
     <h3>Add New Book</h3>
-    <form onSubmit={onSubmit}>
+    <form className="add-book-form" onSubmit={onSubmit}>
       <input type="text" name="title" placeholder="Title" required />
       <input type="text" name="author" placeholder="Author" required />
       <input type="text" name="isbn" placeholder="ISBN" />

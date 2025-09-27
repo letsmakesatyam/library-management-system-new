@@ -203,6 +203,7 @@ class Dashboard extends Component {
       }));
 
       await this.fetchCurrentBorrows(token);
+      await this.fetchHistory(token);
     } catch (err) {
       alert(err.message);
     }
@@ -277,7 +278,7 @@ class Dashboard extends Component {
               onSave={this.handleUpdateBook}
             />
           )}
-          {activeTab === "Students" && <StudentsTab token={token}  onReturnBook={this.handleReturnBook} />}
+          {activeTab === "Students" && <StudentsTab token={token} onReturnBook={this.handleReturnBook} />}
           {activeTab === "Book Borrowers" && <BookBorrowersTab books={this.state.availableBooks} token={token} />}
         </div>
       </div>
@@ -300,7 +301,7 @@ class Dashboard extends Component {
               handleSearch={this.handleSearch}
               filteredBooks={filteredBooks}
               token={token}
-              onBorrow={this.handleBorrowBook}
+              onBorrow={this.handleBorrowBook} // Pass the handleBorrowBook function here
               userRole="student"
             />
           )}

@@ -1,7 +1,9 @@
+// EditBookForm.js
 import React from "react";
+import './EditBookForm.css'; // Import the CSS file
 
 const EditBookForm = ({ book, onSave, onCancel, onDelete }) => (
-  <form onSubmit={(e) => onSave(e, book.id)}>
+  <form className="edit-book-form" onSubmit={(e) => onSave(e, book.id)}>
     <input type="text" name="title" defaultValue={book.title || ""} placeholder="Title" required />
     <input type="text" name="author" defaultValue={book.author || ""} placeholder="Author" required />
     <input type="text" name="isbn" defaultValue={book.isbn || ""} placeholder="ISBN" />

@@ -1,55 +1,33 @@
-.admin-books {
-  margin-top: 20px;
+/* BooksTab.css */
+.books-tab-content {
   padding: 20px;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
-/* Heading */
-.admin-books h3 {
+.search-wrapper {
   margin-bottom: 20px;
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #222;
   text-align: center;
 }
 
-/* Search wrapper */
-.search-wrapper {
-  position: relative;
-  width: 100%;
-  margin-bottom: 25px;
-}
-
-/* Search input */
 .search-wrapper input {
-  width: 100%;
-  padding: 12px 15px 12px 45px;
-  border-radius: 30px;
-  border: 1px solid #ddd;
-  font-size: 0.95rem;
-  background: #f9f9f9;
-  transition: all 0.3s ease;
-  box-sizing: border-box;
+  padding: 10px;
+  width: 80%;
+  max-width: 500px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+  text-align: center;
 }
 
-/* Search focus */
-.search-wrapper input:focus {
-  border-color: #007bff;
-  background: #fff;
-  outline: none;
-  box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  justify-items: center;
 }
 
-/* Search icon inside */
-.search-wrapper::before {
-  content: "🔍";
-  position: absolute;
-  left: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 1rem;
-  color: #666;
-  pointer-events: none;
+/* For smaller screens, adjust column layout */
+@media (max-width: 768px) {
+  .books-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
 }
