@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './Register.css';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 class Register extends Component {
   state = {
     name: '',
@@ -24,7 +26,7 @@ class Register extends Component {
     if (role === 'admin') payload.adminSecret = adminSecret;
 
     try {
-      const res = await fetch('http://localhost:3000/register', {
+      const res = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -33,8 +35,6 @@ class Register extends Component {
       const data = await res.json();
 
       if (res.ok) {
-        
-
         this.setState({ message: 'Registration successful! Redirecting...' });
 
         // Redirect to login after short delay
@@ -45,6 +45,7 @@ class Register extends Component {
         this.setState({ message: data.error });
       }
     } catch (err) {
+      console.error(err);
       this.setState({ message: 'Server error' });
     }
   };

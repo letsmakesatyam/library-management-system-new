@@ -1,12 +1,15 @@
+// BooksTab.js
 import React, { Component } from "react";
 import BookCard from "../BookCard";
 import './BooksTab.css';
+
+const API_URL = process.env.REACT_APP_API_URL;
 
 class BooksTab extends Component {
   handleBorrow = async (bookId) => {
     const { token } = this.props;
     try {
-      const res = await fetch(`http://localhost:3000/borrow/${bookId}`, {
+      const res = await fetch(`${API_URL}/borrow/${bookId}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -15,6 +18,9 @@ class BooksTab extends Component {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to borrow book");
       alert("Book borrowed successfully ✅");
+
+      // Optional: refresh books after borrow
+      if (this.props.refreshBooks) this.props.refreshBooks();
     } catch (err) {
       alert(err.message);
     }
@@ -23,7 +29,7 @@ class BooksTab extends Component {
   handleReturn = async (transactionId) => {
     const { token } = this.props;
     try {
-      const res = await fetch(`http://localhost:3000/transactions/${transactionId}/return`, {
+      const res = await fetch(`${API_URL}/transactions/${transactionId}/return`, {
         method: "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -32,7 +38,9 @@ class BooksTab extends Component {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to return book");
       alert("Book returned successfully ✅");
-      // Optional: refresh books/transactions after return
+
+      // Optional: refresh books after return
+      if (this.props.refreshBooks) this.props.refreshBooks();
     } catch (err) {
       alert(err.message);
     }
@@ -63,7 +71,7 @@ class BooksTab extends Component {
                 {userRole === "student" && book.available_copies > 0 && (
                   <button onClick={() => this.handleBorrow(book.id)}>Borrow</button>
                 )}
-                {userRole === "admin" && book.status === "borrowed" && (
+                {userRole === "admin" && book.status === "borrowed" && book.transactionId && (
                   <button onClick={() => this.handleReturn(book.transactionId)}>Return</button>
                 )}
               </div>

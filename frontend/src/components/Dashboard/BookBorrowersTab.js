@@ -2,6 +2,9 @@
 import React, { Component } from "react";
 import "./BookBorrowersTab.css";
 
+// ✅ Use backend URL from .env
+const API_URL = process.env.REACT_APP_API_URL;
+
 class BookBorrowersTab extends Component {
   state = {
     borrowers: [],
@@ -17,14 +20,14 @@ class BookBorrowersTab extends Component {
     this.setState({ loading: true, error: "", selectedBookId: bookId });
 
     try {
-      const res = await fetch(`http://localhost:3000/transactions/book/${bookId}`, {
+      const res = await fetch(`${API_URL}/transactions/book/${bookId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to fetch borrowers");
 
-      this.setState({ borrowers: data, loading: false });
+      this.setState({ borrowers: Array.isArray(data) ? data : [], loading: false });
     } catch (err) {
       console.error(err);
       this.setState({ error: err.message, loading: false, borrowers: [] });

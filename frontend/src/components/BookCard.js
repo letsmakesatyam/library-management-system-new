@@ -2,15 +2,17 @@
 import React from "react";
 import "./BookCard.css";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 const BookCard = ({ book, onDelete, token }) => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this book?")) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/books/${id}`, {
+      const response = await fetch(`${API_URL}/books/${id}`, {
         method: "DELETE",
         headers: {
-          "Authorization": `Bearer ${token}`, // required for verifyToken
+          Authorization: `Bearer ${token}`, // required for verifyToken
         },
       });
 

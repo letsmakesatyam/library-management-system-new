@@ -1,5 +1,6 @@
 // backend/app.js
 const express = require('express');
+require('dotenv').config(); 
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
@@ -8,7 +9,12 @@ const pool = require('./db');
 
 
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: "https://ubiquitous-spork-x5vgg5grvjx63q44-3001.app.github.dev",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  credentials: true
+}));
+
 
 app.get('/', (req, res) => {
   res.send('Backend is running 🚀');

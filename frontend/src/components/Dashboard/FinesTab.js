@@ -1,13 +1,15 @@
 // FinesTab.js
 import React, { Component } from "react";
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 class FinesTab extends Component {
   handlePayFine = async (fineId) => {
     const token = localStorage.getItem("token");
     if (!token) return alert("Not authenticated");
 
     try {
-      const res = await fetch(`http://localhost:3000/fines/${fineId}/pay`, {
+      const res = await fetch(`${API_URL}/fines/${fineId}/pay`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
@@ -17,7 +19,7 @@ class FinesTab extends Component {
       alert("Fine marked as paid ✅");
 
       // Refresh fines list in parent component
-      this.props.refreshFines(); // <-- callback passed from Dashboard
+      if (this.props.refreshFines) this.props.refreshFines();
     } catch (err) {
       alert(err.message);
     }

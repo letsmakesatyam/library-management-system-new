@@ -1,6 +1,10 @@
 import React, { Component } from "react";
 import "./Login.css";
 
+// Load the API URL from the .env file (must be created in the frontend root)
+// and use the Codespaces URL: https://ubiquitous-spork-x5vgg5grvjx63q44-3000.app.github.dev
+const API_BASE_URL = process.env.REACT_APP_API_URL; 
+
 class Login extends Component {
   state = {
     name: "",
@@ -16,9 +20,17 @@ class Login extends Component {
   handleSubmit = async (event) => {
     event.preventDefault();
     this.setState({ error: "", success: "" });
+    
+    // Safety check for the URL (optional but helpful for debugging)
+    if (!API_BASE_URL) {
+        this.setState({ error: "Configuration Error: API URL is missing. Did you restart the frontend server?" });
+        console.error("API_BASE_URL is undefined. Cannot connect to backend.");
+        return;
+    }
 
     try {
-      const response = await fetch("http://localhost:3000/login", {
+      // ⚠️ FIX: Using the environment variable for the Codespaces URL
+      const response = await fetch(`${API_BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -30,6 +42,7 @@ class Login extends Component {
       const data = await response.json();
 
       if (!response.ok) {
+        // Display the specific error message sent by the backend
         this.setState({ error: data.error || "Login failed" });
         return;
       }
@@ -42,11 +55,12 @@ class Login extends Component {
 
       this.setState({ success: "Login successful!" });
 
-      // Redirect to home page
-      this.props.history.push('/dashboard'); // go to student dashboard
+      // Redirect to dashboard
+      this.props.history.push('/dashboard'); 
     } catch (err) {
-      console.error(err);
-      this.setState({ error: "Something went wrong. Try again!" });
+      console.error("Network or connectivity error:", err);
+      // Generic error message if the fetch call completely failed (e.g., DNS issue, connection refused)
+      this.setState({ error: "Could not connect to the server. Check your Codespaces URL and port forwarding." });
     }
   };
 

@@ -1,5 +1,9 @@
+// StudentsTab.js
 import React, { Component } from "react";
 import "./StudentsTab.css";
+
+// ✅ Use backend URL from .env
+const API_URL = process.env.REACT_APP_API_URL;
 
 class StudentsTab extends Component {
   state = {
@@ -17,11 +21,11 @@ class StudentsTab extends Component {
   fetchStudents = async () => {
     const { token } = this.props;
     try {
-      const res = await fetch("http://localhost:3000/users?role=student", {
+      const res = await fetch(`${API_URL}/users?role=student`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
-      this.setState({ students: data });
+      this.setState({ students: Array.isArray(data) ? data : [] });
     } catch (err) {
       console.error(err);
       this.setState({ error: "Failed to fetch students" });
@@ -32,31 +36,29 @@ class StudentsTab extends Component {
     const { token } = this.props;
     this.setState({ loading: true, transactions: [] });
     try {
-      const res = await fetch(
-        `http://localhost:3000/transactions?user_id=${studentId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await fetch(`${API_URL}/transactions?user_id=${studentId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       const data = await res.json();
-      this.setState({ transactions: data, loading: false, selectedStudentId: studentId });
+      this.setState({
+        transactions: Array.isArray(data) ? data : [],
+        loading: false,
+        selectedStudentId: studentId,
+      });
     } catch (err) {
       console.error(err);
       this.setState({ loading: false, error: "Failed to fetch transactions" });
     }
   };
 
- // StudentsTab.js
+  handleReturn = async (transactionId, bookId) => {
+    await this.props.onReturnBook(transactionId, bookId);
 
-handleReturn = async (transactionId, bookId) => {
-  await this.props.onReturnBook(transactionId, bookId);
-
-  // ✅ After return succeeds, re-fetch the student's transactions
-  if (this.state.selectedStudentId) {
-    this.fetchTransactions(this.state.selectedStudentId);
-  }
-};
-
+    // ✅ After return succeeds, re-fetch the student's transactions
+    if (this.state.selectedStudentId) {
+      this.fetchTransactions(this.state.selectedStudentId);
+    }
+  };
 
   render() {
     const { students, selectedStudentId, transactions, loading, error } = this.state;
@@ -85,7 +87,7 @@ handleReturn = async (transactionId, bookId) => {
         {selectedStudentId && (
           <div className="transactions-list">
             <h4>
-              Transactions of {students.find(s => s.id === selectedStudentId)?.name}
+              Transactions of {students.find((s) => s.id === selectedStudentId)?.name}
             </h4>
             {loading ? (
               <p>Loading transactions...</p>
@@ -99,6 +101,7 @@ handleReturn = async (transactionId, bookId) => {
                     <th>Borrowed At</th>
                     <th>Returned At</th>
                     <th>Status</th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -109,16 +112,15 @@ handleReturn = async (transactionId, bookId) => {
                       <td>{t.returned_at ? new Date(t.returned_at).toLocaleString() : "-"}</td>
                       <td>{t.status}</td>
                       <td>
-        {t.status === "borrowed" && (
-          <button
-  onClick={() => this.handleReturn(t.id, t.book_id)}
-  className="return-btn"
->
-  Return
-</button>
-
-        )}
-      </td>
+                        {t.status === "borrowed" && (
+                          <button
+                            onClick={() => this.handleReturn(t.id, t.book_id)}
+                            className="return-btn"
+                          >
+                            Return
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

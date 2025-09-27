@@ -9,9 +9,11 @@ import BookBorrowersTab from "./BookBorrowersTab";
 import CurrentBorrowsTab from "./CurrentBorrowsTab";
 import HistoryTab from "./HistoryTab";
 import ProfileTab from "./ProfileTab";
-import "./Dashboard.css";
 import FinesTab from "./FinesTab";
+import "./Dashboard.css";
 
+// ✅ Use backend URL from .env
+const API_URL = process.env.REACT_APP_API_URL;
 
 class Dashboard extends Component {
   state = {
@@ -24,7 +26,7 @@ class Dashboard extends Component {
     currentBorrows: [],
     history: [],
     profile: null,
-     fines: [],
+    fines: [],
   };
 
   componentDidMount() {
@@ -43,7 +45,7 @@ class Dashboard extends Component {
   // ---------- Fetch Methods ----------
   fetchBooks = async (token) => {
     try {
-      const res = await fetch("http://localhost:3000/books", {
+      const res = await fetch(`${API_URL}/books`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -59,7 +61,7 @@ class Dashboard extends Component {
 
   fetchCurrentBorrows = async (token) => {
     try {
-      const res = await fetch("http://localhost:3000/student/current-borrows", {
+      const res = await fetch(`${API_URL}/student/current-borrows`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -71,7 +73,7 @@ class Dashboard extends Component {
 
   fetchHistory = async (token) => {
     try {
-      const res = await fetch("http://localhost:3000/student/history", {
+      const res = await fetch(`${API_URL}/student/history`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -83,7 +85,7 @@ class Dashboard extends Component {
 
   fetchProfile = async (token) => {
     try {
-      const res = await fetch("http://localhost:3000/student/profile", {
+      const res = await fetch(`${API_URL}/student/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -91,6 +93,24 @@ class Dashboard extends Component {
     } catch {
       this.setState({ profile: null });
     }
+  };
+
+  fetchFines = async (token) => {
+    try {
+      const res = await fetch(`${API_URL}/student/fines`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      this.setState({ fines: Array.isArray(data) ? data : [] });
+    } catch {
+      this.setState({ fines: [] });
+    }
+  };
+
+  refreshFines = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    await this.fetchFines(token);
   };
 
   // ---------- Actions ----------
@@ -110,7 +130,7 @@ class Dashboard extends Component {
     };
 
     try {
-      const res = await fetch("http://localhost:3000/books", {
+      const res = await fetch(`${API_URL}/books`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(bookData),
@@ -124,53 +144,6 @@ class Dashboard extends Component {
       alert(err.message);
     }
   };
- handleReturnBook = async (transactionId, bookId) => {
-  const token = localStorage.getItem("token");
-  if (!token) return alert("Not authenticated");
-
-  try {
-    const res = await fetch(`http://localhost:3000/return/${transactionId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to return book");
-
-    alert("Book returned successfully ✅");
-
-    // Update available copies in UI
-    this.setState((prev) => ({
-      availableBooks: prev.availableBooks.map((book) =>
-        book.id === bookId
-          ? { ...book, available_copies: book.available_copies + 1 }
-          : book
-      ),
-    }));
-  } catch (err) {
-    alert(err.message);
-  }
-};
-
-
-
-  handleSearch = (e) => this.setState({ searchTerm: e.target.value.toLowerCase() });
-
-  filterBooks = () => {
-    const { availableBooks, searchTerm } = this.state;
-    return availableBooks.filter(
-      (book) =>
-        book.title.toLowerCase().includes(searchTerm) ||
-        book.author.toLowerCase().includes(searchTerm) ||
-        (book.category || "").toLowerCase().includes(searchTerm)
-    );
-  };
-
-  setActiveTab = (tab) => this.setState({ activeTab: tab, editingBookId: null });
-
-  handleDeleteBook = (id) =>
-    this.setState((prev) => ({
-      availableBooks: prev.availableBooks.filter((book) => book.id !== id),
-    }));
 
   handleUpdateBook = async (event, id) => {
     event.preventDefault();
@@ -188,7 +161,7 @@ class Dashboard extends Component {
     };
 
     try {
-      const res = await fetch(`http://localhost:3000/books/${id}`, {
+      const res = await fetch(`${API_URL}/books/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(updatedData),
@@ -197,9 +170,7 @@ class Dashboard extends Component {
       if (!res.ok) throw new Error(data.error || "Failed to update book");
 
       this.setState((prev) => ({
-        availableBooks: prev.availableBooks.map((book) =>
-          book.id === id ? data.book : book
-        ),
+        availableBooks: prev.availableBooks.map((book) => (book.id === id ? data.book : book)),
         editingBookId: null,
       }));
     } catch (err) {
@@ -207,68 +178,95 @@ class Dashboard extends Component {
     }
   };
 
- handleBorrowBook = async (bookId) => {
-  const token = localStorage.getItem("token");
-  if (!token) return alert("Not authenticated");
-
-  try {
-    const res = await fetch(`http://localhost:3000/borrow/${bookId}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error || "Failed to borrow book");
-
-    alert("Book borrowed successfully ✅");
-
-    // Update available copies in UI
+  handleDeleteBook = (id) =>
     this.setState((prev) => ({
-      availableBooks: prev.availableBooks.map((book) =>
-        book.id === bookId
-          ? { ...book, available_copies: book.available_copies - 1 }
-          : book
-      ),
+      availableBooks: prev.availableBooks.filter((book) => book.id !== id),
     }));
 
-    // ✅ Fetch updated current borrows
-    await this.fetchCurrentBorrows(token);
-  } catch (err) {
-    alert(err.message);
-  }
-};
-fetchFines = async (token) => {
-  try {
-    const res = await fetch("http://localhost:3000/student/fines", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    const data = await res.json();
-    this.setState({ fines: Array.isArray(data) ? data : [] });
-  } catch {
-    this.setState({ fines: [] });
-  }
-};
-refreshFines = async () => {
-  const token = localStorage.getItem("token");
-  if (!token) return;
-  await this.fetchFines(token);
-}; 
+  handleBorrowBook = async (bookId) => {
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Not authenticated");
 
+    try {
+      const res = await fetch(`${API_URL}/borrow/${bookId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to borrow book");
 
+      alert("Book borrowed successfully ✅");
+
+      // Update available copies in UI
+      this.setState((prev) => ({
+        availableBooks: prev.availableBooks.map((book) =>
+          book.id === bookId ? { ...book, available_copies: book.available_copies - 1 } : book
+        ),
+      }));
+
+      await this.fetchCurrentBorrows(token);
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  handleReturnBook = async (transactionId, bookId) => {
+    const token = localStorage.getItem("token");
+    if (!token) return alert("Not authenticated");
+
+    try {
+      const res = await fetch(`${API_URL}/return/${transactionId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to return book");
+
+      alert("Book returned successfully ✅");
+
+      this.setState((prev) => ({
+        availableBooks: prev.availableBooks.map((book) =>
+          book.id === bookId ? { ...book, available_copies: book.available_copies + 1 } : book
+        ),
+      }));
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  handleSearch = (e) => this.setState({ searchTerm: e.target.value.toLowerCase() });
+
+  filterBooks = () => {
+    const { availableBooks, searchTerm } = this.state;
+    return availableBooks.filter(
+      (book) =>
+        book.title.toLowerCase().includes(searchTerm) ||
+        book.author.toLowerCase().includes(searchTerm) ||
+        (book.category || "").toLowerCase().includes(searchTerm)
+    );
+  };
+
+  setActiveTab = (tab) => this.setState({ activeTab: tab, editingBookId: null });
 
   // ---------- Tabs ----------
-  renderAdminTabs = (isAdmin) => {
+  renderAdminTabs = () => {
     const { activeTab, searchTerm, editingBookId } = this.state;
     const token = localStorage.getItem("token");
     const filteredBooks = this.filterBooks();
-
-    const tabs = ["Books", "Add Book", "Update/Delete Book", "Students", "Book Borrowers" ,];
+    const tabs = ["Books", "Add Book", "Update/Delete Book", "Students", "Book Borrowers"];
 
     return (
       <div className="admin-dashboard">
         <Tabs activeTab={activeTab} setActiveTab={this.setActiveTab} tabs={tabs} />
         <div className="tab-content">
           {activeTab === "Books" && (
-            <BooksTab searchTerm={searchTerm} handleSearch={this.handleSearch} filteredBooks={filteredBooks} token={token} onDelete={this.handleDeleteBook} />
+            <BooksTab
+              searchTerm={searchTerm}
+              handleSearch={this.handleSearch}
+              filteredBooks={filteredBooks}
+              token={token}
+              onDelete={this.handleDeleteBook}
+            />
           )}
           {activeTab === "Add Book" && <AddBookForm onSubmit={this.handleAddBook} />}
           {activeTab === "Update/Delete Book" && (
@@ -281,32 +279,39 @@ refreshFines = async () => {
               onSave={this.handleUpdateBook}
             />
           )}
-          {activeTab === "Students" && <StudentsTab token={token} onReturnBook={this.handleReturnBook}  />}
+          {activeTab === "Students" && <StudentsTab token={token} onReturnBook={this.handleReturnBook} />}
           {activeTab === "Book Borrowers" && <BookBorrowersTab availableBooks={this.state.availableBooks} />}
         </div>
       </div>
     );
   };
 
-  renderStudentTabs = (isAdmin) => {
-    const { activeTab, searchTerm, currentBorrows, history, profile , fines } = this.state;
+  renderStudentTabs = () => {
+    const { activeTab, searchTerm, currentBorrows, history, profile, fines } = this.state;
     const token = localStorage.getItem("token");
     const filteredBooks = this.filterBooks();
-
-    const tabs = ["Books", "Current Borrows", "History", "Profile" , "Fines"];
+    const tabs = ["Books", "Current Borrows", "History", "Profile", "Fines"];
 
     return (
       <div className="student-dashboard">
         <Tabs activeTab={activeTab} setActiveTab={this.setActiveTab} tabs={tabs} />
         <div className="tab-content">
           {activeTab === "Books" && (
-            <BooksTab searchTerm={searchTerm} handleSearch={this.handleSearch} filteredBooks={filteredBooks} token={token} onBorrow={this.handleBorrowBook} userRole="student" />
+            <BooksTab
+              searchTerm={searchTerm}
+              handleSearch={this.handleSearch}
+              filteredBooks={filteredBooks}
+              token={token}
+              onBorrow={this.handleBorrowBook}
+              userRole="student"
+            />
           )}
           {activeTab === "Current Borrows" && <CurrentBorrowsTab borrows={currentBorrows} />}
           {activeTab === "History" && <HistoryTab history={history} />}
           {activeTab === "Profile" && <ProfileTab profile={profile} />}
-          {activeTab === "Fines" && <FinesTab fines={this.state.fines} isAdmin={isAdmin} refreshFines={this.refreshFines} />}
-
+          {activeTab === "Fines" && (
+            <FinesTab fines={fines} isAdmin={false} refreshFines={this.refreshFines} />
+          )}
         </div>
       </div>
     );
