@@ -1,44 +1,76 @@
-.borrowers-tab {
-  padding: 16px;
-}
+/* BookBorrowersTab.css */
 
-.books-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.book-card {
-  cursor: pointer;
-  padding: 12px;
+.book-borrowers-tab-container {
+  padding: 20px;
+  background-color: #fff;
   border-radius: 8px;
-  background: #f4f4f4;
-  width: 180px;
-  text-align: center;
-  transition: all 0.2s ease-in-out;
 }
 
-.book-card:hover {
-  background: #e0e0e0;
+.books-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
-.book-card.active {
-  background: #d0ebff;
-  border: 2px solid #339af0;
+.books-table-wrapper,
+.borrowers-table-wrapper {
+  overflow-x: auto;
 }
 
-.borrowers-list table {
+.books-table,
+.borrowers-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 16px;
+  min-width: 400px;
 }
 
-.borrowers-list th, .borrowers-list td {
+.books-table th,
+.books-table td,
+.borrowers-table th,
+.borrowers-table td {
   border: 1px solid #ddd;
   padding: 8px;
+  text-align: left;
 }
 
-.borrowers-list th {
-  background: #f0f0f0;
+.books-table th,
+.borrowers-table th {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.book-row:hover,
+.borrowers-table tr:hover {
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
+
+.back-btn {
+  margin-bottom: 15px;
+  padding: 6px 12px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  background-color: #1976d2;
+}
+
+.book-title {
+  margin-bottom: 10px;
+}
+
+.borrowers-table-wrapper {
+  margin-top: 15px;
+}
+
+.books-table td,
+.borrowers-table td {
+  word-break: break-word;
 }

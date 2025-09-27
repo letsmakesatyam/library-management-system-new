@@ -12,7 +12,6 @@ import ProfileTab from "./ProfileTab";
 import FinesTab from "./FinesTab";
 import "./Dashboard.css";
 
-// ✅ Use backend URL from .env
 const API_URL = process.env.REACT_APP_API_URL;
 
 class Dashboard extends Component {
@@ -197,7 +196,6 @@ class Dashboard extends Component {
 
       alert("Book borrowed successfully ✅");
 
-      // Update available copies in UI
       this.setState((prev) => ({
         availableBooks: prev.availableBooks.map((book) =>
           book.id === bookId ? { ...book, available_copies: book.available_copies - 1 } : book
@@ -248,7 +246,6 @@ class Dashboard extends Component {
 
   setActiveTab = (tab) => this.setState({ activeTab: tab, editingBookId: null });
 
-  // ---------- Tabs ----------
   renderAdminTabs = () => {
     const { activeTab, searchTerm, editingBookId } = this.state;
     const token = localStorage.getItem("token");
@@ -266,6 +263,7 @@ class Dashboard extends Component {
               filteredBooks={filteredBooks}
               token={token}
               onDelete={this.handleDeleteBook}
+              userRole="admin"
             />
           )}
           {activeTab === "Add Book" && <AddBookForm onSubmit={this.handleAddBook} />}
@@ -279,8 +277,8 @@ class Dashboard extends Component {
               onSave={this.handleUpdateBook}
             />
           )}
-          {activeTab === "Students" && <StudentsTab token={token} onReturnBook={this.handleReturnBook} />}
-          {activeTab === "Book Borrowers" && <BookBorrowersTab availableBooks={this.state.availableBooks} />}
+          {activeTab === "Students" && <StudentsTab token={token}  onReturnBook={this.handleReturnBook} />}
+          {activeTab === "Book Borrowers" && <BookBorrowersTab books={this.state.availableBooks} token={token} />}
         </div>
       </div>
     );

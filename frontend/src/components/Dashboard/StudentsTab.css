@@ -1,47 +1,92 @@
-.students-tab {
+/* StudentsTab.css */
+
+.students-tab-container {
   padding: 20px;
-}
-
-.students-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.students-list button {
-  padding: 8px 12px;
-  border: 1px solid #007bff;
-  background: #fff;
+  background-color: #fefefe;
   border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s;
 }
 
-.students-list button.active,
-.students-list button:hover {
-  background: #007bff;
-  color: #fff;
+.tab-title {
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+  color: #333;
 }
 
-.transactions-list table {
+.student-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.students-table-wrapper,
+.transactions-table-wrapper {
+  overflow-x: auto;
+}
+
+.students-table,
+.transactions-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 15px;
+  min-width: 400px;
 }
 
-.transactions-list th,
-.transactions-list td {
+.students-table th,
+.students-table td,
+.transactions-table th,
+.transactions-table td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
 }
 
-.transactions-list th {
-  background: #f0f0f0;
+.students-table th,
+.transactions-table th {
+  background-color: #4CAF50;
+  color: white;
 }
 
-.error {
-  color: red;
-  margin-bottom: 10px;
+.student-row:hover {
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
+
+.back-btn {
+  margin-bottom: 15px;
+  padding: 6px 12px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.back-btn:hover {
+  background-color: #1976d2;
+}
+
+.return-btn {
+  padding: 4px 8px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.return-btn:hover {
+  background-color: #d32f2f;
+}
+
+.no-students-msg,
+.no-transactions-msg,
+.error-msg {
+  text-align: center;
+  color: #777;
+}
+
+.transactions-table-scroll {
+  overflow-x: auto;
 }
