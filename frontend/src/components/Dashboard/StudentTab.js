@@ -13,6 +13,8 @@ class StudentsTab extends Component {
     loading: false,
     error: "",
     searchTerm: "",
+    editingTransactionId: null,
+    newDueDate: "",
   };
 
   componentDidMount() {
@@ -59,6 +61,47 @@ class StudentsTab extends Component {
     }
   };
 
+  handleUpdateDueDate = async (transactionId) => {
+    const { token } = this.props;
+    const { newDueDate, selectedStudent } = this.state;
+    if (!newDueDate) {
+      alert("Please select a new due date.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/transactions/${transactionId}/due-date`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ new_due_date: newDueDate }),
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to update due date");
+      }
+
+      alert("Due date updated successfully! ✅");
+      this.setState({ editingTransactionId: null, newDueDate: "" });
+      if (selectedStudent) {
+        this.fetchTransactions(selectedStudent);
+      }
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  handleEditClick = (transaction) => {
+    const formattedDate = transaction.due_date ? new Date(transaction.due_date).toISOString().slice(0, 10) : "";
+    this.setState({
+      editingTransactionId: transaction.id,
+      newDueDate: formattedDate,
+    });
+  };
+
   handleSearch = (e) => {
     const searchTerm = e.target.value.toLowerCase();
     const filteredStudents = this.state.students.filter(
@@ -69,9 +112,31 @@ class StudentsTab extends Component {
     this.setState({ searchTerm: e.target.value, filteredStudents });
   };
 
+  // Helper function to format a date string
+  formatDate = (dateString) => {
+    try {
+      if (!dateString) return "-";
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return "Invalid Date";
+      }
+      return date.toLocaleDateString();
+    } catch {
+      return "Invalid Date";
+    }
+  };
+
   render() {
-    const { filteredStudents, selectedStudent, transactions, loading, error, searchTerm } =
-      this.state;
+    const {
+      filteredStudents,
+      selectedStudent,
+      transactions,
+      loading,
+      error,
+      searchTerm,
+      editingTransactionId,
+      newDueDate,
+    } = this.state;
 
     return (
       <div className="students-tab-container">
@@ -136,6 +201,7 @@ class StudentsTab extends Component {
                     <tr>
                       <th>Book</th>
                       <th>Borrowed At</th>
+                      <th>Due Date</th>
                       <th>Returned At</th>
                       <th>Status</th>
                       <th>Action</th>
@@ -145,17 +211,54 @@ class StudentsTab extends Component {
                     {transactions.map((t) => (
                       <tr key={t.id}>
                         <td>{t.book_title}</td>
-                        <td>{new Date(t.borrowed_at).toLocaleString()}</td>
-                        <td>{t.returned_at ? new Date(t.returned_at).toLocaleString() : "-"}</td>
+                        <td>{this.formatDate(t.borrowed_at)}</td>
+                        <td>
+                          {editingTransactionId === t.id ? (
+                            <input
+                              type="date"
+                              value={newDueDate}
+                              onChange={(e) => this.setState({ newDueDate: e.target.value })}
+                              className="due-date-input"
+                            />
+                          ) : (
+                            this.formatDate(t.due_date)
+                          )}
+                        </td>
+                        <td>{this.formatDate(t.returned_at)}</td>
                         <td>{t.status}</td>
                         <td>
                           {t.status === "borrowed" && (
-                            <button
-                              onClick={() => this.handleReturn(t.id, t.book_id)}
-                              className="return-btn"
-                            >
-                              Return
-                            </button>
+                            <>
+                              {editingTransactionId === t.id ? (
+                                <>
+                                  <button
+                                    onClick={() => this.handleUpdateDueDate(t.id)}
+                                    className="save-btn"
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    onClick={() => this.setState({ editingTransactionId: null })}
+                                    className="cancel-btn"
+                                  >
+                                    Cancel
+                                  </button>
+                                </>
+                              ) : (
+                                <button
+                                  onClick={() => this.handleEditClick(t)}
+                                  className="edit-due-date-btn"
+                                >
+                                  Edit Due Date ✏️
+                                </button>
+                              )}
+                              <button
+                                onClick={() => this.handleReturn(t.id, t.book_id)}
+                                className="return-btn"
+                              >
+                                Return
+                              </button>
+                            </>
                           )}
                         </td>
                       </tr>

@@ -250,51 +250,57 @@ const result = await pool.query(
 
 
 // Get transactions
+// backend/app.js
+
+// ... (existing code before the /transactions endpoint)
+
 app.get('/transactions', verifyToken, async (req, res) => {
-  const studentId = req.query.user_id; // optional for admin to filter specific student
+    const studentId = req.query.user_id; // optional for admin to filter specific student
 
-  try {
-    let result;
+    try {
+        let result;
 
-    if (req.user.role === 'admin') {
-      // Admin: filter by student if user_id provided, else get all
-      if (studentId) {
-        result = await pool.query(
-          `SELECT t.id, u.name AS student_name, b.title AS book_title, t.borrowed_at, t.returned_at, t.status
-           FROM transactions t
-           JOIN users u ON t.user_id = u.id
-           JOIN books b ON t.book_id = b.id
-           WHERE u.id = $1
-           ORDER BY t.borrowed_at DESC`,
-          [studentId]
-        );
-      } else {
-        result = await pool.query(
-          `SELECT t.id, u.name AS student_name, b.title AS book_title, t.borrowed_at, t.returned_at, t.status
-           FROM transactions t
-           JOIN users u ON t.user_id = u.id
-           JOIN books b ON t.book_id = b.id
-           ORDER BY t.borrowed_at DESC`
-        );
-      }
-    } else {
-      // Student: only their own transactions
-      result = await pool.query(
-        `SELECT t.id, b.title AS book_title, t.borrowed_at, t.returned_at, t.status
-         FROM transactions t
-         JOIN books b ON t.book_id = b.id
-         WHERE t.user_id = $1
-         ORDER BY t.borrowed_at DESC`,
-        [req.user.id]
-      );
+        if (req.user.role === 'admin') {
+            // Admin: filter by student if user_id provided, else get all
+            if (studentId) {
+                result = await pool.query(
+                    `SELECT t.id, u.name AS student_name, b.title AS book_title, t.borrowed_at, t.returned_at, t.status, t.due_date
+                    FROM transactions t
+                    JOIN users u ON t.user_id = u.id
+                    JOIN books b ON t.book_id = b.id
+                    WHERE u.id = $1
+                    ORDER BY t.borrowed_at DESC`,
+                    [studentId]
+                );
+            } else {
+                result = await pool.query(
+                    `SELECT t.id, u.name AS student_name, b.title AS book_title, t.borrowed_at, t.returned_at, t.status, t.due_date
+                    FROM transactions t
+                    JOIN users u ON t.user_id = u.id
+                    JOIN books b ON t.book_id = b.id
+                    ORDER BY t.borrowed_at DESC`
+                );
+            }
+        } else {
+            // Student: only their own transactions
+            result = await pool.query(
+                `SELECT t.id, b.title AS book_title, t.borrowed_at, t.returned_at, t.status, t.due_date
+                FROM transactions t
+                JOIN books b ON t.book_id = b.id
+                WHERE t.user_id = $1
+                ORDER BY t.borrowed_at DESC`,
+                [req.user.id]
+            );
+        }
+
+        res.json(result.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
     }
-
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Server error');
-  }
 });
+
+// ... (existing code after the /transactions endpoint)
 // Admin returns a book
 // Admin returns a book with fine calculation
 app.patch('/transactions/:id/return', verifyToken, async (req, res) => {

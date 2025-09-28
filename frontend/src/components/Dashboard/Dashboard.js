@@ -4,7 +4,7 @@ import Tabs from "./Tabs";
 import BooksTab from "./BooksTab";
 import AddBookForm from "./AddBookForm";
 import UpdateDeleteTab from "./UpdateDeleteTab";
-import StudentsTab from "./StudentTab";
+import StudentsTab from "./StudentTab"; // Corrected import path
 import BookBorrowersTab from "./BookBorrowersTab";
 import CurrentBorrowsTab from "./CurrentBorrowsTab";
 import HistoryTab from "./HistoryTab";
