@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import BookCard from "../BookCard";
 import './BooksTab.css';
 
-const API_URL = process.env.REACT_APP_API_URL;
+
 
 class BooksTab extends Component {
   render() {

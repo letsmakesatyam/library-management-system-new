@@ -9,11 +9,22 @@ const pool = require('./db');
 
 
 app.use(express.json());
-app.use(cors({
-  origin: "https://ubiquitous-spork-x5vgg5grvjx63q44-3001.app.github.dev",
-  methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-  credentials: true
-}));
+app.use(cors());
+const finesRoutes = require("./routes/fines");
+const verifyToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader) return res.status(401).json({ error: 'Token missing' });
+
+  const token = authHeader.split(' ')[1];
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) return res.status(403).json({ error: 'Invalid token' });
+    req.user = user; // store decoded info in req.user
+    next();
+  });
+};
+
+app.use("/api/fines", verifyToken, finesRoutes);
+
 
 
 app.get('/', (req, res) => {
@@ -137,17 +148,7 @@ app.post('/login', async (req, res) => {
 
 
 // Middleware to verify JWT and extract user info
-const verifyToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  if (!authHeader) return res.status(401).json({ error: 'Token missing' });
 
-  const token = authHeader.split(' ')[1];
-  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-    if (err) return res.status(403).json({ error: 'Invalid token' });
-    req.user = user; // store decoded info in req.user
-    next();
-  });
-};
 
 // Admin route to add a book
 // Admin route to add a book
@@ -533,8 +534,7 @@ app.get('/student/current-borrows', verifyToken, async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT t.id, b.title AS book_title, t.borrowed_at,
-              (t.borrowed_at + INTERVAL '14 days') AS due_date
+      `SELECT t.id, b.title AS book_title, t.borrowed_at, t.due_date
        FROM transactions t
        JOIN books b ON t.book_id = b.id
        WHERE t.user_id = $1 AND t.status = 'borrowed'
@@ -548,6 +548,7 @@ app.get('/student/current-borrows', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
 
 
 // RETURN BOOK API

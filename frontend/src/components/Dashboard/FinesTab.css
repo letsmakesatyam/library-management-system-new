@@ -1,0 +1,62 @@
+.fines-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 0 15px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.fines-title {
+  text-align: center;
+  color: #2c3e50;
+  margin-bottom: 20px;
+}
+
+.no-fines {
+  text-align: center;
+  font-size: 18px;
+  color: #27ae60;
+}
+
+.fines-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.fine-card {
+  padding: 15px 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #f9f9f9;
+  transition: transform 0.2s;
+}
+
+.fine-card:hover {
+  transform: translateY(-3px);
+}
+
+.fine-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.fine-label {
+  font-weight: 600;
+  color: #34495e;
+}
+
+.fine-value {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.fine-value.paid {
+  color: #27ae60;
+  font-weight: 600;
+}
+
+.fine-value.unpaid {
+  color: #e74c3c;
+  font-weight: 600;
+}
