@@ -10,6 +10,7 @@ class StudentsTab extends Component {
     filteredStudents: [],
     selectedStudent: null,
     transactions: [],
+    fines: {}, // Map transactionId => fine object
     loading: false,
     error: "",
     searchTerm: "",
@@ -36,21 +37,69 @@ class StudentsTab extends Component {
     }
   };
 
+  // Fetch transactions and map fines properly
   fetchTransactions = async (student) => {
     const { token } = this.props;
-    this.setState({ loading: true, transactions: [], selectedStudent: student });
+    this.setState({ loading: true, transactions: [], fines: {}, selectedStudent: student });
     try {
-      const res = await fetch(`${API_URL}/transactions?user_id=${student.id}`, {
+      const transactionsRes = await fetch(`${API_URL}/transactions?user_id=${student.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await res.json();
-      this.setState({
-        transactions: Array.isArray(data) ? data : [],
-        loading: false,
-      });
+      const transactionsData = await transactionsRes.json();
+      const transactionsArray = Array.isArray(transactionsData) ? transactionsData : [];
+
+      // Fetch fines for each transaction
+      const finesMap = {};
+      await Promise.all(
+        transactionsArray.map(async (tx) => {
+          try {
+            const fineRes = await fetch(`${API_URL}/fines/transaction/${tx.id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            if (fineRes.ok) {
+              const fineData = await fineRes.json();
+              finesMap[tx.id] = fineData.length ? fineData[0] : null; // normalize to single object or null
+            }
+          } catch (err) {
+            console.error(`Failed to fetch fine for transaction ${tx.id}:`, err);
+          }
+        })
+      );
+
+      this.setState({ transactions: transactionsArray, fines: finesMap, loading: false });
     } catch (err) {
       console.error(err);
       this.setState({ loading: false, error: "Failed to fetch transactions" });
+    }
+  };
+
+  handlePayFine = async (transactionId) => {
+    const { token } = this.props;
+    const fine = this.state.fines[transactionId];
+    if (!fine) return;
+
+    try {
+      const res = await fetch(`${API_URL}/fines/${fine.id}/pay`, {
+        method: "PATCH",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to pay fine");
+
+      alert("Fine marked as paid ✅");
+
+      // Refresh fine for this transaction
+      const fineRes = await fetch(`${API_URL}/fines/transaction/${transactionId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (fineRes.ok) {
+        const fineData = await fineRes.json();
+        this.setState((prev) => ({
+          fines: { ...prev.fines, [transactionId]: fineData.length ? fineData[0] : null },
+        }));
+      }
+    } catch (err) {
+      alert(err.message);
     }
   };
 
@@ -62,8 +111,9 @@ class StudentsTab extends Component {
   };
 
   handleUpdateDueDate = async (transactionId) => {
-    const { token } = this.props;
     const { newDueDate, selectedStudent } = this.state;
+    const { token } = this.props;
+
     if (!newDueDate) {
       alert("Please select a new due date.");
       return;
@@ -86,9 +136,7 @@ class StudentsTab extends Component {
 
       alert("Due date updated successfully! ✅");
       this.setState({ editingTransactionId: null, newDueDate: "" });
-      if (selectedStudent) {
-        this.fetchTransactions(selectedStudent);
-      }
+      if (selectedStudent) this.fetchTransactions(selectedStudent);
     } catch (err) {
       alert(err.message);
     }
@@ -96,10 +144,7 @@ class StudentsTab extends Component {
 
   handleEditClick = (transaction) => {
     const formattedDate = transaction.due_date ? new Date(transaction.due_date).toISOString().slice(0, 10) : "";
-    this.setState({
-      editingTransactionId: transaction.id,
-      newDueDate: formattedDate,
-    });
+    this.setState({ editingTransactionId: transaction.id, newDueDate: formattedDate });
   };
 
   handleSearch = (e) => {
@@ -112,31 +157,14 @@ class StudentsTab extends Component {
     this.setState({ searchTerm: e.target.value, filteredStudents });
   };
 
-  // Helper function to format a date string
   formatDate = (dateString) => {
-    try {
-      if (!dateString) return "-";
-      const date = new Date(dateString);
-      if (isNaN(date.getTime())) {
-        return "Invalid Date";
-      }
-      return date.toLocaleDateString();
-    } catch {
-      return "Invalid Date";
-    }
+    if (!dateString) return "-";
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? "Invalid Date" : date.toLocaleDateString();
   };
 
   render() {
-    const {
-      filteredStudents,
-      selectedStudent,
-      transactions,
-      loading,
-      error,
-      searchTerm,
-      editingTransactionId,
-      newDueDate,
-    } = this.state;
+    const { filteredStudents, selectedStudent, transactions, fines, loading, error, searchTerm, editingTransactionId, newDueDate } = this.state;
 
     return (
       <div className="students-tab-container">
@@ -165,11 +193,7 @@ class StudentsTab extends Component {
                   </thead>
                   <tbody>
                     {filteredStudents.map((student) => (
-                      <tr
-                        key={student.id}
-                        onClick={() => this.fetchTransactions(student)}
-                        className="student-row"
-                      >
+                      <tr key={student.id} onClick={() => this.fetchTransactions(student)} className="student-row">
                         <td>{student.name}</td>
                         <td>{student.roll_no}</td>
                       </tr>
@@ -183,10 +207,7 @@ class StudentsTab extends Component {
 
         {selectedStudent && (
           <div className="transactions-table-wrapper">
-            <button
-              onClick={() => this.setState({ selectedStudent: null, transactions: [] })}
-              className="back-btn"
-            >
+            <button onClick={() => this.setState({ selectedStudent: null, transactions: [], fines: {} })} className="back-btn">
               ⬅ Back to Students
             </button>
             <h4 className="transactions-title">Transactions of {selectedStudent.name}</h4>
@@ -204,65 +225,51 @@ class StudentsTab extends Component {
                       <th>Due Date</th>
                       <th>Returned At</th>
                       <th>Status</th>
+                      <th>Fine</th>
                       <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {transactions.map((t) => (
-                      <tr key={t.id}>
-                        <td>{t.book_title}</td>
-                        <td>{this.formatDate(t.borrowed_at)}</td>
-                        <td>
-                          {editingTransactionId === t.id ? (
-                            <input
-                              type="date"
-                              value={newDueDate}
-                              onChange={(e) => this.setState({ newDueDate: e.target.value })}
-                              className="due-date-input"
-                            />
-                          ) : (
-                            this.formatDate(t.due_date)
-                          )}
-                        </td>
-                        <td>{this.formatDate(t.returned_at)}</td>
-                        <td>{t.status}</td>
-                        <td>
-                          {t.status === "borrowed" && (
-                            <>
-                              {editingTransactionId === t.id ? (
-                                <>
-                                  <button
-                                    onClick={() => this.handleUpdateDueDate(t.id)}
-                                    className="save-btn"
-                                  >
-                                    Save
-                                  </button>
-                                  <button
-                                    onClick={() => this.setState({ editingTransactionId: null })}
-                                    className="cancel-btn"
-                                  >
-                                    Cancel
-                                  </button>
-                                </>
-                              ) : (
-                                <button
-                                  onClick={() => this.handleEditClick(t)}
-                                  className="edit-due-date-btn"
-                                >
-                                  Edit Due Date ✏️
-                                </button>
-                              )}
-                              <button
-                                onClick={() => this.handleReturn(t.id, t.book_id)}
-                                className="return-btn"
-                              >
-                                Return
-                              </button>
-                            </>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
+                    {transactions.map((t) => {
+                      const fine = fines[t.id];
+                      return (
+                        <tr key={t.id}>
+                          <td>{t.book_title}</td>
+                          <td>{this.formatDate(t.borrowed_at)}</td>
+                          <td>
+                            {editingTransactionId === t.id ? (
+                              <input type="date" value={newDueDate} onChange={(e) => this.setState({ newDueDate: e.target.value })} className="due-date-input" />
+                            ) : (
+                              this.formatDate(t.due_date)
+                            )}
+                          </td>
+                          <td>{this.formatDate(t.returned_at)}</td>
+                          <td>{t.status}</td>
+                          <td>
+                            {fine ? `₹${fine.amount} ` : "-"}
+                            {fine && !fine.paid && (
+                              <button onClick={() => this.handlePayFine(t.id)} className="pay-fine-btn">Pay</button>
+                            )}
+                            {fine && fine.paid && <span>(Paid)</span>}
+                          </td>
+                          <td>
+                            {t.status === "borrowed" && (
+                              <>
+                                {editingTransactionId === t.id ? (
+                                  <>
+                                    <button onClick={() => this.handleUpdateDueDate(t.id)} className="save-btn">Save</button>
+                                    <button onClick={() => this.setState({ editingTransactionId: null })} className="cancel-btn">Cancel</button>
+                                  </>
+                                ) : (
+                                  <button onClick={() => this.handleEditClick(t)} className="edit-due-date-btn">Edit Due Date ✏️</button>
+                                )}
+                                <button onClick={() => this.handleReturn(t.id, t.book_id)} className="return-btn">Return</button>
+                              </>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

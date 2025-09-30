@@ -713,3 +713,27 @@ app.patch('/fines/:id/pay', verifyToken, async (req, res) => {
     res.status(500).json({ error: 'Failed to update fine' });
   }
 });
+
+
+// Get fine for a particular transaction
+app.get('/fines/transaction/:transactionId', verifyToken, async (req, res) => {
+  const { transactionId } = req.params;
+
+  try {
+    const result = await pool.query(
+      `SELECT f.id, f.amount, f.paid, t.book_id, b.title AS book_title, f.created_at
+       FROM fines f
+       JOIN transactions t ON f.transaction_id = t.id
+       JOIN books b ON t.book_id = b.id
+       WHERE f.transaction_id = $1`,
+      [transactionId]
+    );
+
+    // always return an array
+    return res.json(result.rows);  
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch fine' });
+  }
+});
+
