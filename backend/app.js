@@ -744,7 +744,7 @@ app.get('/fines/transaction/:transactionId', verifyToken, async (req, res) => {
 app.use(express.static(path.join(__dirname, 'build')));
 
 // Handle React routing, return index.html for any unknown paths
-app.get('*', (req, res) => {
+app.get( (req, res) => {
   res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
