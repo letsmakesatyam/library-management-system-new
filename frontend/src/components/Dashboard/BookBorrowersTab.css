@@ -3,28 +3,47 @@
 .book-borrowers-tab-container {
   padding: 20px;
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.section-title {
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-size: 1.3rem;
+  color: #333;
+  border-bottom: 2px solid #4CAF50;
+  padding-bottom: 4px;
 }
 
 .books-search-input {
   width: 100%;
-  padding: 8px 12px;
-  margin-bottom: 15px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
   font-size: 1rem;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 6px;
+  transition: all 0.2s ease-in-out;
+}
+
+.books-search-input:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
 }
 
 .books-table-wrapper,
 .borrowers-table-wrapper {
   overflow-x: auto;
+  margin-bottom: 30px;
 }
 
 .books-table,
 .borrowers-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 400px;
+  min-width: 500px;
 }
 
 .books-table th,
@@ -32,7 +51,7 @@
 .borrowers-table th,
 .borrowers-table td {
   border: 1px solid #ddd;
-  padding: 8px;
+  padding: 10px;
   text-align: left;
 }
 
@@ -40,6 +59,7 @@
 .borrowers-table th {
   background-color: #4CAF50;
   color: white;
+  font-weight: 600;
 }
 
 .book-row:hover,
@@ -50,27 +70,39 @@
 
 .back-btn {
   margin-bottom: 15px;
-  padding: 6px 12px;
+  padding: 8px 16px;
   background-color: #2196F3;
   color: white;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
 }
 
 .back-btn:hover {
   background-color: #1976d2;
 }
 
-.book-title {
-  margin-bottom: 10px;
+.book-info-card {
+  padding: 15px 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  background-color: #f9f9f9;
 }
 
-.borrowers-table-wrapper {
-  margin-top: 15px;
+.book-title {
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+  color: #333;
 }
 
 .books-table td,
 .borrowers-table td {
   word-break: break-word;
+}
+
+.borrowers-table-wrapper table {
+  margin-top: 10px;
 }
