@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt');
 const cors = require('cors');
 const app = express();
 const pool = require('./db');
+const path = require('path');
 
 
 app.use(express.json());
@@ -32,7 +33,7 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
 app.get('/db-test', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
@@ -737,3 +738,10 @@ app.get('/fines/transaction/:transactionId', verifyToken, async (req, res) => {
   }
 });
 
+app.use(express.static(path.join(__dirname, 'build')));
+
+// Handle React routing, return index.html for any unknown paths
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
