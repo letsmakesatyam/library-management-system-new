@@ -1,8 +1,6 @@
 import React, { Component } from "react";
 import "./Login.css";
 
-// Load the API URL from the .env file (must be created in the frontend root)
-// and use the Codespaces URL: https://ubiquitous-spork-x5vgg5grvjx63q44-3000.app.github.dev
 const API_BASE_URL = process.env.REACT_APP_API_URL; 
 
 class Login extends Component {
@@ -11,25 +9,37 @@ class Login extends Component {
     password: "",
     error: "",
     success: "",
+    isLoading: false,
+    shake: false
   };
 
   handleChange = (event) => {
-    this.setState({ [event.target.name]: event.target.value });
+    this.setState({ 
+      [event.target.name]: event.target.value,
+      error: "" // Clear error when user starts typing
+    });
   };
 
   handleSubmit = async (event) => {
     event.preventDefault();
-    this.setState({ error: "", success: "" });
+    this.setState({ 
+      error: "", 
+      success: "", 
+      isLoading: true,
+      shake: false 
+    });
     
-    // Safety check for the URL (optional but helpful for debugging)
     if (!API_BASE_URL) {
-        this.setState({ error: "Configuration Error: API URL is missing. Did you restart the frontend server?" });
+        this.setState({ 
+          error: "Configuration Error: API URL is missing. Did you restart the frontend server?",
+          isLoading: false,
+          shake: true
+        });
         console.error("API_BASE_URL is undefined. Cannot connect to backend.");
         return;
     }
 
     try {
-      // ⚠️ FIX: Using the environment variable for the Codespaces URL
       const response = await fetch(`${API_BASE_URL}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -42,64 +52,104 @@ class Login extends Component {
       const data = await response.json();
 
       if (!response.ok) {
-        // Display the specific error message sent by the backend
-        this.setState({ error: data.error || "Login failed" });
+        this.setState({ 
+          error: data.error || "Login failed", 
+          isLoading: false,
+          shake: true 
+        });
         return;
       }
 
-      // Save JWT token in localStorage
       localStorage.setItem("token", data.token);
-
-      // Update parent App state
       this.props.handleLogin();
 
-      this.setState({ success: "Login successful!" });
+      this.setState({ 
+        success: "Login successful! Redirecting...",
+        isLoading: false 
+      });
 
-      // Redirect to dashboard
-      this.props.history.push('/dashboard'); 
+      // Add a small delay to show success message
+      setTimeout(() => {
+        this.props.history.push('/dashboard');
+      }, 1500);
+      
     } catch (err) {
       console.error("Network or connectivity error:", err);
-      // Generic error message if the fetch call completely failed (e.g., DNS issue, connection refused)
-      this.setState({ error: "Could not connect to the server. Check your Codespaces URL and port forwarding." });
+      this.setState({ 
+        error: "Could not connect to the server. Check your Codespaces URL and port forwarding.",
+        isLoading: false,
+        shake: true
+      });
     }
   };
 
   render() {
+    const { name, password, error, success, isLoading, shake } = this.state;
+    
     return (
-      <div className="login-container">
-        <h2>Login</h2>
-        <form className="login-form" onSubmit={this.handleSubmit}>
-          <div className="form-group">
-            <label>Username</label>
-            <input
-              type="text"
-              name="name"
-              value={this.state.name}
-              onChange={this.handleChange}
-              placeholder="Enter username"
-              required
-            />
+      <div className="login-page-container">
+        <div className={`login-card ${shake ? 'shake' : ''}`}>
+          <h2 className="login-heading">Librarium Login</h2>
+          <p className="login-subtitle">Welcome back to your digital library</p>
+          
+          <form className="login-form" onSubmit={this.handleSubmit}>
+            <div className="form-group floating">
+              <input
+                className="form-input"
+                type="text"
+                name="name"
+                value={name}
+                onChange={this.handleChange}
+                placeholder=" "
+                required
+              />
+              <label className="form-label">Username</label>
+            </div>
+
+            <div className="form-group floating">
+              <input
+                className="form-input"
+                type="password"
+                name="password"
+                value={password}
+                onChange={this.handleChange}
+                placeholder=" "
+                required
+              />
+              <label className="form-label">Password</label>
+            </div>
+
+            <button 
+              type="submit" 
+              className={`submit-btn ${isLoading ? 'loading' : ''}`}
+              disabled={isLoading}
+            >
+              {isLoading ? '' : 'Login'}
+            </button>
+          </form>
+
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
+          
+          {success && (
+            <div className="success-message">
+              {success}
+            </div>
+          )}
+
+          {/* Additional decorative elements */}
+          <div style={{ 
+            textAlign: 'center', 
+            marginTop: '2rem', 
+            color: '#6b7280',
+            fontSize: '0.875rem'
+          }}>
+            Secure access to Librarium
           </div>
-
-          <div className="form-group">
-            <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              value={this.state.password}
-              onChange={this.handleChange}
-              placeholder="Enter password"
-              required
-            />
-          </div>
-
-          <button type="submit" className="login-btn">
-            Login
-          </button>
-        </form>
-
-        {this.state.error && <p className="error">{this.state.error}</p>}
-        {this.state.success && <p className="success">{this.state.success}</p>}
+        </div>
       </div>
     );
   }

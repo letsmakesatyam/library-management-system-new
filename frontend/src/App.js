@@ -63,7 +63,7 @@ class App extends Component {
     return (
       <div className="app-container">
         <header className="app-header">
-          <h2>📚 Library App</h2>
+          
           <Navbar isLoggedIn={isLoggedIn} handleLogout={this.handleLogout} />
         </header>
 

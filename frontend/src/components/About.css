@@ -1,118 +1,218 @@
-.about-container {
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
-  line-height: 1.6;
+/* Import fonts from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap');
+
+/* --- Color Palette --- */
+:root {
+  --primary-dark: #2c3e50;    /* Charcoal */
+  --accent-red: #e74c3c;      /* Deep Coral */
+  --background-light: #f9f7f6; /* Off-white */
+  --text-dark: #34495e;       /* Dark Blue Gray */
+  --text-light: #555;         /* Medium Gray */
 }
 
-/* Hero Section */
-.about-hero {
-  background: url("https://images.unsplash.com/photo-1532012197267-da84d127e765?ixlib=rb-4.0.3&auto=format&fit=crop&w=1650&q=80")
-    center/cover no-repeat;
-  height: 50vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* --- General & Typography --- */
+body, html {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--text-dark);
+  line-height: 1.7;
+  background-color: var(--background-light);
+}
+
+.about-page-container {
+  overflow-x: hidden;
+}
+
+.section-heading {
+  font-family: 'Lora', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 2rem;
+  text-align: center;
   position: relative;
-  color: white;
-  text-align: center;
 }
 
-.about-hero-overlay {
-  background: rgba(0, 0, 0, 0.6);
-  padding: 2rem 3rem;
-  border-radius: 10px;
+.section-heading::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 4px;
+  background-color: var(--accent-red);
+  border-radius: 2px;
 }
 
-.about-hero h1 {
-  font-size: 3rem;
-  margin-bottom: 1rem;
-}
-
-.about-hero p {
-  font-size: 1.2rem;
-  color: #e0e0e0;
-}
-
-/* Mission & Vision */
-.mission-vision {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 2rem;
-  padding: 3rem 1rem;
-  background: #f4f4f4;
-}
-
-.mission, .vision {
-  background: white;
-  padding: 2rem;
-  border-radius: 12px;
-  width: 300px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  text-align: center;
-}
-
-/* History */
-.history {
-  padding: 3rem 1rem;
-  text-align: center;
+.section-text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--text-light);
   max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+/* --- Hero Section --- */
+.about-hero-section {
+  height: 60vh;
+  /* Updated Background Image URL */
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1524995997946-a1c2e315a713?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2940&q=80');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: white;
+}
+
+.about-hero-title {
+  font-family: 'Lora', serif;
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.about-hero-subtitle {
+  font-size: 1.2rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+/* --- Mission & Vision --- */
+.mission-vision-section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  padding: 5rem 2rem;
+  max-width: 1000px;
   margin: 0 auto;
 }
 
-/* What We Offer */
-.what-we-offer {
-  padding: 3rem 1rem;
-  background: #f9f9f9;
+@media (min-width: 768px) {
+  .mission-vision-section {
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+}
+
+.mission-card, .vision-card {
+  padding: 2.5rem;
+  background-color: #fff;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   text-align: center;
 }
 
-.offer-list {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 2rem;
-  margin-top: 2rem;
+.mission-card:hover, .vision-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
 }
 
-.offer-card {
-  background: white;
-  padding: 2rem;
-  width: 250px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-  transition: transform 0.2s ease;
-}
-
-.offer-card:hover {
-  transform: translateY(-5px);
-}
-
-.offer-card h3 {
+.mission-card .section-heading, .vision-card .section-heading {
   margin-bottom: 1rem;
 }
 
-/* CTA Section */
-.about-cta {
+.mission-card .section-heading::after, .vision-card .section-heading::after {
+  display: none;
+}
+
+/* --- History Section --- */
+.history-section {
+  padding: 5rem 2rem;
+  background-color: var(--background-light);
+}
+
+/* --- What We Offer Section --- */
+.what-we-offer-section {
+  padding: 5rem 2rem;
+  background-color: #fff;
+}
+
+.offer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 3rem;
+}
+
+.offer-card {
+  padding: 2rem;
+  background-color: var(--background-light);
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease;
   text-align: center;
-  padding: 4rem 1rem;
-  background: linear-gradient(135deg, #2c3e50, #34495e);
+}
+
+.offer-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+}
+
+.offer-title {
+  font-family: 'Lora', serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 1rem;
+}
+
+.offer-text {
+  font-size: 1rem;
+  color: var(--text-light);
+}
+
+/* --- CTA Section --- */
+.about-cta-section {
+  background: linear-gradient(135deg, var(--primary-dark), #34495e);
   color: white;
+  padding: 5rem 2rem;
+  text-align: center;
 }
 
-.about-cta h2 {
-  margin-bottom: 1.5rem;
+.about-cta-title {
+  font-family: 'Lora', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
 }
 
-.about-cta .btn {
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
+.cta-button {
+  display: inline-block;
+  padding: 0.9rem 2.5rem;
+  background-color: var(--accent-red);
+  color: white;
   text-decoration: none;
-  background: #d35400;
-  color: white;
+  border-radius: 50px;
+  font-size: 1.1rem;
   font-weight: 500;
+  transition: all 0.3s ease;
 }
 
-.about-cta .btn:hover {
-  background: #b84300;
+.cta-button:hover {
+  background-color: #c0392b;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+  .about-hero-title {
+    font-size: 2.5rem;
+  }
+  .section-heading {
+    font-size: 2rem;
+  }
+  .section-text {
+    font-size: 1rem;
+  }
+  .about-cta-title {
+    font-size: 2rem;
+  }
 }

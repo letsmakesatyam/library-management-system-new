@@ -1,162 +1,433 @@
-/* BookCard.css */
-.book-card {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  background-color: #fff;
-  transition: transform 0.2s ease-in-out;
-  height: 550px; /* Fixed height for all cards */
-}
+/* Import fonts from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Montserrat:wght@400;500;600;700&display=swap');
 
-.book-card:hover {
-  transform: translateY(-5px);
-}
+/* New Color Palette
+   Primary (Dark): #2c3e50 (Charcoal)
+   Secondary (Accent): #e74c3c (Deep Coral)
+   Tertiary (Light): #f9f7f6 (Off-white)
+   Text: #34495e (Dark Blue Gray)
+   Shadow: rgba(0, 0, 0, 0.1)
+*/
 
-.book-image {
-  width: 150px;
-  height: 200px;
-  object-fit: cover;
-  border-radius: 4px;
-  margin-bottom: 12px;
-}
-
-.book-info {
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1; /* Allows the info section to take up remaining space */
-  width: 100%;
-}
-
-.book-title {
-  font-size: 1.25em;
-  font-weight: bold;
+/* ============================================
+   GLOBAL STYLES & RESET
+   ============================================ */
+body, html {
   margin: 0;
-  color: #333;
+  padding: 0;
+  font-family: 'Montserrat', sans-serif;
+  color: #34495e;
+  line-height: 1.7;
+  background-color: #f9f7f6;
+  scroll-behavior: smooth;
 }
 
-.book-author {
-  font-style: italic;
-  color: #666;
-  margin: 4px 0 8px;
+.home-container {
+  overflow-x: hidden;
 }
 
-.scrollable-content {
-  flex-grow: 1; /* Allows this content to expand and fill available space */
-  overflow-y: auto; /* Enables vertical scrolling */
-  padding-right: 10px; /* Space for the scrollbar */
-  margin-bottom: 12px;
-  text-align: left;
-  line-height: 1.5;
+.section-title {
+  text-align: center;
+  font-family: 'Lora', serif;
+  font-size: 3.2rem;
+  font-weight: 700;
+  margin-bottom: 3.5rem;
+  position: relative;
+  color: #2c3e50;
+  animation: slideIn 1s forwards;
+  opacity: 0;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -15px;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 5px;
+  background-color: #e74c3c;
+  border-radius: 2px;
+}
+
+p {
+  font-size: 1.1rem;
+  line-height: 1.8;
   color: #555;
-  max-height: 120px; /* Fixed height for scrollable area */
 }
 
-/* Hide scrollbar for Chrome, Safari, and Opera */
-.scrollable-content::-webkit-scrollbar {
-  width: 8px;
-}
-
-/* Track */
-.scrollable-content::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 10px;
-}
-
-/* Handle */
-.scrollable-content::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 10px;
-}
-
-/* Handle on hover */
-.scrollable-content::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-.available-copies {
-  font-weight: bold;
-  color: #007bff;
-  margin: 12px 0;
-}
-
-.card-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
-}
-
-.card-actions button {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1em;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-}
-
-.borrow-btn {
-  background-color: #28a745;
-  color: white;
-}
-
-.borrow-btn:hover {
-  background-color: #218838;
-}
-
-.return-btn {
-  background-color: #ffc107;
-  color: #333;
-}
-
-.return-btn:hover {
-  background-color: #e0a800;
-}
-
-.delete-btn {
-  background-color: #dc3545;
-  color: white;
-}
-
-.delete-btn:hover {
-  background-color: #c82333;
-}
-
-/* BookCard.css */
-
-/* ... (Your existing CSS code) ... */
-
-.card-actions button,
-.out-of-stock-message {
-  width: 100%;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  font-size: 1em;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-  text-align: center; /* Ensure the text is centered */
-}
-
-.card-actions button {
-  cursor: pointer;
-}
-
-/* ... (Your existing button styles) ... */
-
-.out-of-stock-message {
-  background-color: #dc3545; /* A red background to signify a negative status */
-  color: white; /* White text for contrast */
-  opacity: 0.8; /* Slightly transparent to differentiate from a clickable button */
-  cursor: not-allowed; /* Change cursor to indicate it's not clickable */
+/* ============================================
+   HERO SECTION
+   ============================================ */
+.hero-section {
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  text-align: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1521587765099-8835e72951d3?q=80&w=2940&auto=format&fit=crop');
+  background-size: cover;
+  background-position: center;
+}
+
+.hero-content {
+  z-index: 2;
+  max-width: 900px;
+  padding: 0 2rem;
+}
+
+.hero-title {
+  font-family: 'Lora', serif;
+  font-size: 4.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.hero-subtitle {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 400;
+  max-width: 700px;
+  margin: 0 auto 2.5rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Hero Button Styles */
+.btn {
+  font-size: 1.1rem;
+  font-weight: 500;
+  padding: 0.9rem 2.8rem;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+  display: inline-block;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.btn-hero-primary {
+  background-color: #e74c3c;
+  color: white;
+  margin-right: 1.5rem;
+}
+
+.btn-hero-primary:hover {
+  background-color: #c0392b;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.btn-hero-secondary {
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+.btn-hero-secondary:hover {
+  background-color: rgba(255,255,255,0.1);
+  transform: translateY(-3px);
+}
+
+/* Keyframe Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
+.animate-fade-in-delay { animation: fadeIn 0.8s ease-out 0.4s forwards; opacity: 0; }
+.animate-fade-in-delay-2 { animation: fadeIn 0.8s ease-out 0.8s forwards; opacity: 0; }
+
+/* ============================================
+   STATS SECTION
+   ============================================ */
+.stats-section {
+  background-color: #f9f7f6;
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stat-card {
+  padding: 3rem;
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.stat-card:hover {
+  transform: translateY(-15px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+.stat-card h3 {
+  font-family: 'Lora', serif;
+  font-size: 3.8rem;
+  color: #e74c3c;
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.stat-card p {
+  font-size: 1.1rem;
+  color: #555;
+  margin: 0;
+}
+
+/* ============================================
+   FEATURED BOOKS
+   ============================================ */
+.featured-section {
+  padding: 6rem 2rem;
+  background-color: #fff;
+}
+
+.section-header {
+  max-width: 1200px;
+  margin: 0 auto 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.view-all-link {
+  color: #e74c3c;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: color 0.3s;
+}
+
+.view-all-link:hover {
+  color: #c0392b;
+  text-decoration: underline;
+}
+
+.books-slider {
+  display: flex;
+  overflow-x: scroll;
+  gap: 2.5rem;
+  padding: 1rem 2rem;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.books-slider::-webkit-scrollbar {
+  display: none;
+}
+
+.book-card {
+  flex-shrink: 0;
+  width: 240px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.book-card:hover {
+  transform: scale(1.05);
+}
+
+.book-card img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  transition: box-shadow 0.3s ease;
+}
+
+.book-card:hover img {
+    box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+}
+
+.book-info {
+  margin-top: 1.5rem;
+}
+
+.book-info h3 {
+  font-family: 'Lora', serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #2c3e50;
+}
+
+.book-info p {
+  font-size: 0.95rem;
+  color: #7f8c8d;
+  margin: 0;
+}
+
+/* ============================================
+   FEATURES SECTION
+   ============================================ */
+.features-section {
+  background-color: #f9f7f6;
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.feature-card {
+  background: white;
+  padding: 3rem;
+  border-radius: 15px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.feature-card:hover {
+  transform: translateY(-15px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+}
+
+.feature-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+  font-family: 'Lora', serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+}
+
+.feature-card p {
+  font-size: 1rem;
+  color: #555;
+  margin: 0;
+}
+
+/* ============================================
+   CALL TO ACTION
+   ============================================ */
+.cta-section {
+  background-color: #2c3e50;
+  color: white;
+  padding: 6rem 2rem;
+  text-align: center;
+}
+
+.cta-title {
+  font-family: 'Lora', serif;
+  font-size: 3.2rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.cta-subtitle {
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-bottom: 2.5rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.cta-buttons .btn {
+  margin: 0 0.75rem;
+}
+
+.btn-cta-primary {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-cta-primary:hover {
+  background-color: #c0392b;
+  transform: translateY(-3px);
+}
+
+.btn-cta-secondary {
+  background-color: transparent;
+  color: white;
+  border: 2px solid white;
+}
+
+.btn-cta-secondary:hover {
+  background-color: rgba(255,255,255,0.1);
+  transform: translateY(-3px);
+}
+
+/* ============================================
+   RESPONSIVE DESIGN
+   ============================================ */
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 3rem;
+  }
+  .hero-subtitle {
+    font-size: 1.1rem;
+  }
+  .section-title {
+    font-size: 2.5rem;
+  }
+  .stats-grid, .features-grid {
+    grid-template-columns: 1fr;
+  }
+  .section-header {
+    flex-direction: column;
+    align-items: center;
+  }
+  .view-all-link {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 2rem;
+  }
+  .hero-subtitle {
+    font-size: 0.9rem;
+  }
+  .btn {
+    padding: 0.7rem 2rem;
+    font-size: 1rem;
+  }
+  .hero-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .btn-hero-primary, .btn-hero-secondary {
+    margin-right: 0;
+  }
+  .book-card {
+    width: 180px;
+  }
+  .book-card img {
+    height: 270px;
+  }
 }
